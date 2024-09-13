@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "effection": "npm:effection",
+    "bdd": "jsr:@std/testing/bdd",
+    "expect": "jsr:@std/expect"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["prefer-const", "require-yield"]
+    }
+  }
+}
