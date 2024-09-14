@@ -1,4 +1,4 @@
-import { run, sleep, spawn, suspend, type Task } from "effection";
+import { run, sleep, spawn, type Task } from "effection";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { useTaskBuffer } from "./task-buffer.ts";
