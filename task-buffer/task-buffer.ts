@@ -13,10 +13,33 @@ import {
   useScope,
 } from "effection";
 
+/**
+ * Spawn operations, but only allow a certain number to be active at a
+ * given time. Once the `TaskBuffer` becomes full, it will queue up spawn
+ * operations until room becomes available
+ */
 export interface TaskBuffer extends Operation<void> {
+  /**
+   * Spawn `op` in the task buffer when there is room available. If
+   *  there is room, then this operation will complete immediately.
+   * Otherwise, it will return once there is room in the buffer and
+   * the task is successfully spawned.
+   * `spawn()` operation will not return until the task has actually
+   * been spawned.
+   *
+   * @param op - the operation to spawn in the buffer.
+   * @returns the spawned task.
+   */
   spawn<T>(op: () => Operation<T>): Operation<Task<T>>;
 }
 
+/**
+ * create a new `TaskBuffer` attached to the current scope. It will
+ * not allow its number of active tasks to exceed `max`.
+ *
+ * @param max - the maximum number of concurrent tasks.
+ * @returns the new task buffer.
+ */
 export function useTaskBuffer(max: number): Operation<TaskBuffer> {
   return resource(function* (provide) {
     let input = createChannel<SpawnRequest<unknown>, never>();
