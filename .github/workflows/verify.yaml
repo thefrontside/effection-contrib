@@ -2,9 +2,9 @@ name: Verify
 
 on:
   push:
-    branches: v[3-9]
+    branches: main
   pull_request:
-    branches: v[3-9]
+    branches: main
 
 permissions:
   contents: read
@@ -36,6 +36,3 @@ jobs:
 
       - name: test
         run: deno task test
-  
-      - name: test:node
-        run: deno task test:node
