@@ -1,4 +1,4 @@
-import { run, sleep, spawn, suspend, type Task } from "effection";
+import { run, sleep, spawn, type Task } from "effection";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { useTaskBuffer } from "./task-buffer.ts";
@@ -27,9 +27,21 @@ describe("TaskBuffer", () => {
     });
   });
 
-  it("spawns new tasks when space becomes available", () => {
-  });
+  it("allows to wait until buffer is drained", async () => {
+    let finished = 0;
+    await run(function*() {
+      let buffer = yield* useTaskBuffer(5);
+      for (let i = 0; i < 3; i++) {
+	yield* buffer.spawn(function*() {
+	  yield* sleep(10);
+	  finished++;
+	});
+      }
+      expect(finished).toEqual(0);
 
-  it("allows to wait until there are now more tasks", () => {
+      yield* buffer;
+
+      expect(finished).toEqual(3);
+    });
   });
 });
