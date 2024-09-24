@@ -1,6 +1,6 @@
 import { main, suspend } from "effection";
 import { config } from "effection-www/tailwind.config.ts";
-import { route, createRevolution } from "revolution";
+import { createRevolution, route } from "revolution";
 import { twindPlugin } from "effection-www/plugins/twind.ts";
 import { etagPlugin } from "effection-www/plugins/etag.ts";
 import { rebasePlugin } from "effection-www/plugins/rebase.ts";
