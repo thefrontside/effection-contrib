@@ -14,7 +14,7 @@ import { z } from "zod";
 
 export interface Package {
   path: string;
-  dirname: string;
+  workspace: string;
   packageName: string;
   readme: string;
   exports: string | Record<string, string>;
@@ -49,49 +49,49 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   if (denoJson.private === true) {
     throw new PrivatePackageError(workspace);
-  } else {
-    const readme = yield* call(() =>
-      Deno.readTextFile(join(workspacePath, "README.md"))
-    );
-
-    let mod = yield* call(() =>
-      evaluate(readme, {
-        // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
-        jsx,
-        // @ts-expect-error Type '{ (component: JSXComponent, props: JSXComponentProps): JSXElement; (element: string, props: JSXElementProps): JSXElement; }' is not assignable to type 'Jsx'.
-        jsxs,
-        // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
-        jsxDEV: jsx,
-        Fragment,
-        remarkPlugins: [remarkGfm],
-        rehypePlugins: [[rehypePrismPlus, { showLineNumbers: true }]],
-      })
-    );
-
-    const content = mod.default({});
-
-    let file: VFile = yield* call(() =>
-      unified()
-        .use(remarkParse)
-        .use(remarkRehype)
-        .use(rehypeStringify)
-        .use(rehypeInferDescriptionMeta, {
-          inferDescriptionHast: true,
-          truncateSize: 400,
-        })
-        .process(
-          readme,
-        )
-    );
-
-    return {
-      dirname: workspace.replace("./", ""),
-      path: workspacePath,
-      packageName: denoJson.name,
-      exports: denoJson.exports,
-      readme,
-      MDXContent: () => content,
-      MDXDescription: () => (<>{file.data?.meta?.description}</>),
-    };
   }
+
+  const readme = yield* call(() =>
+    Deno.readTextFile(join(workspacePath, "README.md"))
+  );
+
+  let mod = yield* call(() =>
+    evaluate(readme, {
+      // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
+      jsx,
+      // @ts-expect-error Type '{ (component: JSXComponent, props: JSXComponentProps): JSXElement; (element: string, props: JSXElementProps): JSXElement; }' is not assignable to type 'Jsx'.
+      jsxs,
+      // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
+      jsxDEV: jsx,
+      Fragment,
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [[rehypePrismPlus, { showLineNumbers: true }]],
+    })
+  );
+
+  const content = mod.default({});
+
+  let file: VFile = yield* call(() =>
+    unified()
+      .use(remarkParse)
+      .use(remarkRehype)
+      .use(rehypeStringify)
+      .use(rehypeInferDescriptionMeta, {
+        inferDescriptionHast: true,
+        truncateSize: 400,
+      })
+      .process(
+        readme,
+      )
+  );
+
+  return {
+    workspace: workspace.replace("./", ""),
+    path: workspacePath,
+    packageName: denoJson.name,
+    exports: denoJson.exports,
+    readme,
+    MDXContent: () => content,
+    MDXDescription: () => (<>{file.data?.meta?.description}</>),
+  };
 }
