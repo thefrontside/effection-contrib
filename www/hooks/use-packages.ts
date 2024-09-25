@@ -1,5 +1,5 @@
 import { call, type Operation } from "effection";
-import { type Package, PrivatePackageError, usePackage } from "./use-package.ts";
+import { type Package, PrivatePackageError, usePackage } from "./use-package.tsx";
 
 export function* usePackages(): Operation<Package[]> {
   const root = yield* call(() =>

@@ -1,25 +1,25 @@
 import { type JSXHandler, useParams } from "revolution";
-import { usePackage } from "../hooks/use-package.ts";
+import { usePackage } from "../hooks/use-package.tsx";
 import { useAppHtml } from "./app.html.tsx";
-import { Package } from "../hooks/use-package.ts";
+import type { Package } from "../hooks/use-package.tsx";
 
-export function moduleRoute(): JSXHandler {
+export function packageRoute(): JSXHandler {
   return function* () {
-    const params = yield* useParams<{ moduleName: string }>();
+    const params = yield* useParams<{ packageName: string }>();
 
     let pkg: Package;
     try {
-      pkg = yield* usePackage(params.moduleName);
+      pkg = yield* usePackage(params.packageName);
     } catch (e) {
       const AppHTML = yield* useAppHtml({
-        title: `${params.moduleName}`,
+        title: `${params.packageName}`,
         description: `Not found`,
-        pageTitle: `${params.moduleName} not found`,
+        pageTitle: `${params.packageName} not found`,
       });
       return (
         <AppHTML>
           <p>
-            {params.moduleName} not found
+            {params.packageName} not found
           </p>
         </AppHTML>
       );

@@ -5,7 +5,7 @@ import { twindPlugin } from "effection-www/plugins/twind.ts";
 import { etagPlugin } from "effection-www/plugins/etag.ts";
 import { rebasePlugin } from "effection-www/plugins/rebase.ts";
 import { indexRoute } from "./routes/index.tsx";
-import { moduleRoute } from "./routes/module.tsx";
+import { packageRoute } from "./routes/package.tsx";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -13,7 +13,7 @@ if (import.meta.main) {
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),
-        route("/:moduleName", moduleRoute()),
+        route("/:packageName", packageRoute()),
       ],
       plugins: [twindPlugin({ config }), etagPlugin(), rebasePlugin()],
     });

@@ -5,7 +5,7 @@ import rehypeInferDescriptionMeta from "rehype-infer-description-meta";
 import rehypePrismPlus from "rehype-prism-plus";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
-import remarkParse from 'remark-parse';
+import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { Fragment, jsx, jsxs } from "revolution/jsx-runtime";
 import { unified } from "unified";
@@ -29,10 +29,9 @@ const DenoJson = z.object({
   private: z.union([z.undefined(), z.literal(true)]),
 });
 
-
 export class PrivatePackageError extends Error {
   constructor(packageName: string) {
-    super(`Could not import ${packageName} because it's private`)
+    super(`Could not import ${packageName} because it's private`);
   }
 }
 
@@ -57,8 +56,11 @@ export function* usePackage(workspace: string): Operation<Package> {
 
     let mod = yield* call(() =>
       evaluate(readme, {
+        // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
         jsx,
+        // @ts-expect-error Type '{ (component: JSXComponent, props: JSXComponentProps): JSXElement; (element: string, props: JSXElementProps): JSXElement; }' is not assignable to type 'Jsx'.
         jsxs,
+        // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
         jsxDEV: jsx,
         Fragment,
         remarkPlugins: [remarkGfm],
@@ -73,9 +75,12 @@ export function* usePackage(workspace: string): Operation<Package> {
         .use(remarkParse)
         .use(remarkRehype)
         .use(rehypeStringify)
-        .use(rehypeInferDescriptionMeta, { inferDescriptionHast: true, truncateSize: 400 })
+        .use(rehypeInferDescriptionMeta, {
+          inferDescriptionHast: true,
+          truncateSize: 400,
+        })
         .process(
-          readme
+          readme,
         )
     );
 
@@ -86,7 +91,7 @@ export function* usePackage(workspace: string): Operation<Package> {
       exports: denoJson.exports,
       readme,
       MDXContent: () => content,
-      MDXDescription: () => file.data.meta.description
-    }
+      MDXDescription: () => (<>{file.data?.meta?.description}</>),
+    };
   }
 }
