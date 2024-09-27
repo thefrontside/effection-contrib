@@ -11,6 +11,8 @@ import { Fragment, jsx, jsxs } from "revolution/jsx-runtime";
 import { unified } from "unified";
 import type { VFile } from "vfile";
 import { z } from "zod";
+import { PrivatePackageError } from "../errors.ts";
+import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 
 export interface Package {
   path: string;
@@ -18,6 +20,7 @@ export interface Package {
   packageName: string;
   readme: string;
   exports: string | Record<string, string>;
+  docs: Array<DocNode> | Record<string, Array<DocNode>>
   MDXContent: () => JSX.Element;
   MDXDescription: () => JSX.Element;
 }
@@ -28,12 +31,6 @@ const DenoJson = z.object({
   exports: z.union([z.record(z.string()), z.string()]),
   private: z.union([z.undefined(), z.literal(true)]),
 });
-
-export class PrivatePackageError extends Error {
-  constructor(packageName: string) {
-    super(`Could not import ${packageName} because it's private`);
-  }
-}
 
 export function* usePackage(workspace: string): Operation<Package> {
   const workspacePath = resolve(
@@ -85,12 +82,23 @@ export function* usePackage(workspace: string): Operation<Package> {
       )
   );
 
+  let docs: Package['docs'];
+  if (typeof denoJson.exports === "string") {
+    docs = yield* useDenoDoc(`${new URL(join(workspacePath, denoJson.exports), 'file://')}`)
+  } else {
+    docs = {};
+    for (const key of Object.keys(denoJson.exports)) {
+      docs[key] = yield* useDenoDoc(`${new URL(join(workspacePath, denoJson.exports[key]), 'file://')}`)
+    }
+  }
+
   return {
     workspace: workspace.replace("./", ""),
     path: workspacePath,
     packageName: denoJson.name,
     exports: denoJson.exports,
     readme,
+    docs,
     MDXContent: () => content,
     MDXDescription: () => (<>{file.data?.meta?.description}</>),
   };
