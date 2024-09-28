@@ -4,6 +4,7 @@ import { useAppHtml } from "./app.html.tsx";
 import type { Package } from "../hooks/use-package.tsx";
 import type { RoutePath, SitemapRoute } from "effection-www/plugins/sitemap.ts";
 import { usePackages } from "../hooks/use-packages.ts";
+import { PackageExports } from "../components/package-exports.tsx";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
@@ -55,6 +56,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
             <p>
               <pkg.MDXDescription />
             </p>
+            <PackageExports pkg={pkg} />
           </>
         </AppHTML>
       );
