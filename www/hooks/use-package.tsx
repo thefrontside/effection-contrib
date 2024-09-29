@@ -1,18 +1,12 @@
-import { evaluate } from "@mdx-js/mdx";
-import { join, resolve } from "@std/path";
 import { call, type Operation } from "effection";
-import rehypeInferDescriptionMeta from "rehype-infer-description-meta";
-import rehypePrismPlus from "rehype-prism-plus";
-import rehypeStringify from "rehype-stringify";
-import remarkGfm from "remark-gfm";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { Fragment, jsx, jsxs } from "revolution/jsx-runtime";
-import { unified } from "unified";
-import type { VFile } from "vfile";
-import { z } from "zod";
+import { join, resolve } from "jsr:@std/path@1.0.6";
+import type { VFile } from "npm:vfile@6.0.3";
+import { z } from "npm:zod@3.23.8";
+
 import { PrivatePackageError } from "../errors.ts";
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
+import { useMDX } from "./use-mdx.tsx";
+import { useRemarkParse } from "./use-remark-parse.tsx";
 
 export interface Package {
   path: string;
@@ -20,7 +14,7 @@ export interface Package {
   packageName: string;
   readme: string;
   exports: string | Record<string, string>;
-  docs: Array<DocNode> | Record<string, Array<DocNode>>
+  docs: Array<DocNode> | Record<string, Array<DocNode>>;
   MDXContent: () => JSX.Element;
   MDXDescription: () => JSX.Element;
 }
@@ -52,43 +46,23 @@ export function* usePackage(workspace: string): Operation<Package> {
     Deno.readTextFile(join(workspacePath, "README.md"))
   );
 
-  let mod = yield* call(() =>
-    evaluate(readme, {
-      // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
-      jsx,
-      // @ts-expect-error Type '{ (component: JSXComponent, props: JSXComponentProps): JSXElement; (element: string, props: JSXElementProps): JSXElement; }' is not assignable to type 'Jsx'.
-      jsxs,
-      // @ts-expect-error Type 'unknown' is not assignable to type 'JSXComponent'.
-      jsxDEV: jsx,
-      Fragment,
-      remarkPlugins: [remarkGfm],
-      rehypePlugins: [[rehypePrismPlus, { showLineNumbers: true }]],
-    })
-  );
+  let mod = yield* useMDX(readme);
 
   const content = mod.default({});
 
-  let file: VFile = yield* call(() =>
-    unified()
-      .use(remarkParse)
-      .use(remarkRehype)
-      .use(rehypeStringify)
-      .use(rehypeInferDescriptionMeta, {
-        inferDescriptionHast: true,
-        truncateSize: 400,
-      })
-      .process(
-        readme,
-      )
-  );
+  let file: VFile = yield* useRemarkParse(readme);
 
-  let docs: Package['docs'];
+  let docs: Package["docs"];
   if (typeof denoJson.exports === "string") {
-    docs = yield* useDenoDoc(`${new URL(join(workspacePath, denoJson.exports), 'file://')}`)
+    docs = yield* useDenoDoc(
+      `${new URL(join(workspacePath, denoJson.exports), "file://")}`,
+    );
   } else {
     docs = {};
     for (const key of Object.keys(denoJson.exports)) {
-      docs[key] = yield* useDenoDoc(`${new URL(join(workspacePath, denoJson.exports[key]), 'file://')}`)
+      docs[key] = yield* useDenoDoc(
+        `${new URL(join(workspacePath, denoJson.exports[key]), "file://")}`,
+      );
     }
   }
 
@@ -100,6 +74,6 @@ export function* usePackage(workspace: string): Operation<Package> {
     readme,
     docs,
     MDXContent: () => content,
-    MDXDescription: () => (<>{file.data?.meta?.description}</>),
+    MDXDescription: () => <>{file.data?.meta?.description}</>,
   };
 }

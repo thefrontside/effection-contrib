@@ -1,7 +1,8 @@
+import { join } from "jsr:@std/path@1.0.6";
 import type { JSXElement } from "revolution/jsx-runtime";
-import type { Package } from "../hooks/use-package.tsx";
+
 import type { DocNode } from "../hooks/use-deno-doc.tsx";
-import { join } from "@std/path";
+import type { Package } from "../hooks/use-package.tsx";
 
 export function PackageExports({ pkg }: { pkg: Package }): JSXElement {
   if (isDocArray(pkg.docs)) {
@@ -28,6 +29,7 @@ export function PackageExports({ pkg }: { pkg: Package }): JSXElement {
       </>
     );
   }
+  return <></>
 }
 
 interface PackageExportOptions {

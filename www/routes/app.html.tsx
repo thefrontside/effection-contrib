@@ -1,6 +1,5 @@
 import type { Operation } from "effection";
 import type { JSXChild } from "revolution";
-
 import { useAbsoluteUrl } from "effection-www/plugins/rebase.ts";
 
 export interface Options {

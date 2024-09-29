@@ -1,14 +1,12 @@
-export {
-  Rehype as OriginalRehype,
-  type RehypeOptions,
-} from "effection-www/components/rehype.tsx";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeAddClasses from "rehype-add-classes";
-import rehypeInferDescriptionMeta from "rehype-infer-description-meta";
+import { Rehype as OriginalRehype } from "effection-www/components/rehype.tsx";
+import rehypeSlug from "npm:rehype-slug@6.0.0";
+import rehypeAutolinkHeadings from "npm:rehype-autolink-headings@7.1.0";
+import rehypeAddClasses from "npm:rehype-add-classes@1.0.0";
+import rehypeInferDescriptionMeta from "npm:rehype-infer-description-meta@1.0.0";
+import type { JSXElement } from "revolution/jsx-runtime";
 
 interface RehypeProps {
-  children: () => JSX.Element;
+  children: JSXElement;
 }
 
 export function Rehype({ children }: RehypeProps) {
