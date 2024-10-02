@@ -50,9 +50,13 @@ export function* usePackage(workspace: string): Operation<Package> {
     throw new PrivatePackageError(workspace);
   }
 
-  const readme = yield* call(() =>
-    Deno.readTextFile(join(workspacePath, "README.md"))
-  );
+  const readme = yield* call(async () => {
+    try {
+      return await Deno.readTextFile(join(workspacePath, "README.md"))
+    } catch {
+      return "Could not find a README.md file";
+    }
+  });
 
   let mod = yield* useMDX(readme);
 
@@ -75,6 +79,7 @@ export function* usePackage(workspace: string): Operation<Package> {
   for (const key of Object.keys(entrypoints)) {
     const docNodes = yield* useDenoDoc(String(entrypoints[key]));
     docs[key] = yield* all(docNodes.map(function* (node) {
+      console.log({ node })
       if (node.jsDoc && node.jsDoc.doc) {
         try {
           const mod = yield* useMDX(node.jsDoc.doc);

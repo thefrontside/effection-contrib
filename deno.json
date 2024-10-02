@@ -27,6 +27,7 @@
   "workspace": [
     "./www",
     "./task-buffer",
-    "./tinyexec"
+    "./tinyexec",
+    "./examples"
   ]
 }

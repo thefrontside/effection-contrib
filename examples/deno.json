@@ -1,0 +1,6 @@
+{
+  "name": "@effection-contrib/examples",
+  "exports": {
+    ".": "./mod.ts"
+  }
+}
