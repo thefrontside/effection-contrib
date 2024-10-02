@@ -1,8 +1,7 @@
 import { join } from "jsr:@std/path@1.0.6";
 import type { JSXElement } from "revolution/jsx-runtime";
 
-import type { DocNode } from "../hooks/use-deno-doc.tsx";
-import { DEFAULT_MODULE_KEY, RenderableDocNode, type Package } from "../hooks/use-package.tsx";
+import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
 
 export function Exports({ pkg }: { pkg: Package }): JSXElement {
   return (
@@ -28,15 +27,19 @@ function PackageExport({ packageName, exportName, doc }: PackageExportOptions) {
   const exports = doc.flatMap((doc) => {
     if (doc.declarationKind === "export") {
       return [
-        <a href={`#${doc.id}`}>{doc.name}</a>, ", "];
+        <a class="underline text-slate-300 decoration-dotted hover:decoration-solid	" href={`#${doc.id}`}>{doc.name}</a>,
+        ", ",
+      ];
     } else {
       return [];
     }
   }).slice(0, -1);
 
   return (
-    <pre>
-      import &#123;{" "}<>{exports}</>{" "}&#125; from "{join(packageName, exportName)}"
+    <pre class="language-ts">
+      <code class="language-ts code-highlight">
+        <span class="token keyword">import</span> <span class="token punctuation">&#123;{" "}</span><>{exports}</>{" "}<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">"{join(packageName, exportName)}"</span>
+      </code>
     </pre>
   );
 }

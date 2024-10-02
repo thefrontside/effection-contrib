@@ -1,10 +1,13 @@
 import { main, suspend } from "effection";
-import { config } from "effection-www/tailwind.config.ts";
 import { createRevolution } from "revolution";
+
+import { config } from "effection-www/tailwind.config.ts";
+import { route, sitemapPlugin } from "effection-www/plugins/sitemap.ts";
 import { twindPlugin } from "effection-www/plugins/twind.ts";
 import { etagPlugin } from "effection-www/plugins/etag.ts";
-import { route, sitemapPlugin } from "effection-www/plugins/sitemap.ts";
 import { rebasePlugin } from "effection-www/plugins/rebase.ts";
+
+import { assetsRoute } from "./routes/assets-route.ts";
 import { indexRoute } from "./routes/index.tsx";
 import { packageRoute } from "./routes/package.tsx";
 
@@ -14,6 +17,7 @@ if (import.meta.main) {
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),
+        route("/assets(.*)", assetsRoute("assets")),
         route("/:workspace", packageRoute()),
       ],
       plugins: [
