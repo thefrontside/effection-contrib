@@ -4,9 +4,31 @@
     "bdd": "jsr:@std/testing/bdd",
     "expect": "jsr:@std/expect"
   },
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "dom.iterable",
+      "dom"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "revolution"
+  },
+  "scopes": {
+    "https://raw.githubusercontent.com/thefrontside/effection/4982887c1677b847d256402e8709f2b1d49437e6/www/": {
+      "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
+      "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts"
+    }
+  },
   "lint": {
     "rules": {
       "exclude": ["prefer-const", "require-yield"]
     }
-  }
+  },
+  "workspace": [
+    "./www",
+    "./deno-deploy",
+    "./task-buffer",
+    "./tinyexec",
+    "./examples"
+  ]
 }

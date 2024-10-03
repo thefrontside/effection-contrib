@@ -1,0 +1,5 @@
+{
+  "name": "@effection-contrib/task-buffer",
+  "version": "0.1.0",
+  "exports": "./mod.ts"
+}
