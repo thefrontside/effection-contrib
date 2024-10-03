@@ -1,4 +1,4 @@
-import { createContext, type Operation } from "effection";
+import { type Context, createContext, type Operation } from "effection";
 
 export interface DenoDeploy {
   /**
@@ -19,7 +19,7 @@ export interface DenoDeploy {
   region: string | undefined;
 }
 
-export const DenoDeployContext = createContext<DenoDeploy>("deno-deploy", {
+export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>("deno-deploy", {
   isDenoDeploy: false,
   deploymentId: undefined,
   region: undefined,
@@ -52,12 +52,12 @@ export function* useDenoDeploy(): Operation<DenoDeploy> {
  * });
  * ```
  */
-export function* initDenoDeploy() {
+export function* initDenoDeploy(): Operation<DenoDeploy> {
   const deploymentId = Deno.env.get("DENO_DEPLOYMENT_ID");
   const region = Deno.env.get("DENO_REGION");
   const isDenoDeploy = deploymentId !== undefined;
 
-  yield* DenoDeployContext.set({
+  return yield* DenoDeployContext.set({
     isDenoDeploy,
     deploymentId,
     region,

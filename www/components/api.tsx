@@ -4,7 +4,6 @@ import type {
   ParamDef,
   TsTypeDef,
   TsTypeRefDef,
-  TsTypeTypeRefDef,
 } from "https://deno.land/x/deno_doc@0.125.0/types.d.ts";
 
 interface DescriptionProps {
