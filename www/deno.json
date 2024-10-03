@@ -11,6 +11,6 @@
     "@std/assert": "jsr:@std/assert@1",
     "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
     "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts",
-    "@effection-contri/deno-deploy": "file://../deno-deploy/mod.ts"
+    "@effection-contrib/deno-deploy": "../deno-deploy/mod.ts"
   }
 }
