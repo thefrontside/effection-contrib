@@ -1,5 +1,6 @@
 import { main, suspend } from "effection";
 import { createRevolution } from "revolution";
+import { initDenoDeploy } from "@effection-contrib/deno-deploy";
 
 import { config } from "effection-www/tailwind.config.ts";
 import { route, sitemapPlugin } from "effection-www/plugins/sitemap.ts";
@@ -14,6 +15,8 @@ import { packageRoute } from "./routes/package.tsx";
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   await main(function* () {
+    yield* initDenoDeploy();
+    
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),

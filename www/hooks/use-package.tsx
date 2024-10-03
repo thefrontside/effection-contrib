@@ -79,7 +79,6 @@ export function* usePackage(workspace: string): Operation<Package> {
   for (const key of Object.keys(entrypoints)) {
     const docNodes = yield* useDenoDoc(String(entrypoints[key]));
     docs[key] = yield* all(docNodes.map(function* (node) {
-      console.log({ node })
       if (node.jsDoc && node.jsDoc.doc) {
         try {
           const mod = yield* useMDX(node.jsDoc.doc);

@@ -26,6 +26,7 @@
   },
   "workspace": [
     "./www",
+    "./deno-deploy",
     "./task-buffer",
     "./tinyexec",
     "./examples"

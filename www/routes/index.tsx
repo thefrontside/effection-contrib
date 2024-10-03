@@ -1,7 +1,8 @@
-import type { JSXElement } from "revolution";
-import { useAppHtml } from "./app.html.tsx";
-import { usePackages } from "../hooks/use-packages.ts";
+
 import type { SitemapRoute } from "effection-www/plugins/sitemap.ts";
+import type { JSXElement } from "revolution";
+import { usePackages } from "../hooks/use-packages.ts";
+import { useAppHtml } from "./app.html.tsx";
 
 export function indexRoute(): SitemapRoute<JSXElement> {
   return {
