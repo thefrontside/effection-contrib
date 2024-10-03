@@ -33,10 +33,10 @@ export function* useAppHtml({
     <a href="https://deno.land/x/effection/mod.ts">API</a>,
     <a
       class="flex flex-row"
-      href={isDenoDeploy ? "/contribs" : "/"}
+      href={isDenoDeploy ? "/contrib" : "/"}
     >
       <span class="hidden md:inline-flex">
-        Contribs
+        Contrib
       </span>
     </a>,
   
