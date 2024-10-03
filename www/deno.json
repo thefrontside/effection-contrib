@@ -1,6 +1,7 @@
 {
   "name": "@effection-contrib/www",
   "exports": "./main.ts",
+  "version": "0.1.0",
   "tasks": {
     "dev": "deno run  -A --watch main.ts"
   },
