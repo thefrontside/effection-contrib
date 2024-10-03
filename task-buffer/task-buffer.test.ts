@@ -29,13 +29,13 @@ describe("TaskBuffer", () => {
 
   it("allows to wait until buffer is drained", async () => {
     let finished = 0;
-    await run(function*() {
+    await run(function* () {
       let buffer = yield* useTaskBuffer(5);
       for (let i = 0; i < 3; i++) {
-	yield* buffer.spawn(function*() {
-	  yield* sleep(10);
-	  finished++;
-	});
+        yield* buffer.spawn(function* () {
+          yield* sleep(10);
+          finished++;
+        });
       }
       expect(finished).toEqual(0);
 
