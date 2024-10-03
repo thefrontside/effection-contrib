@@ -19,11 +19,14 @@ export interface DenoDeploy {
   region: string | undefined;
 }
 
-export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>("deno-deploy", {
-  isDenoDeploy: false,
-  deploymentId: undefined,
-  region: undefined,
-});
+export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>(
+  "deno-deploy",
+  {
+    isDenoDeploy: false,
+    deploymentId: undefined,
+    region: undefined,
+  },
+);
 
 /**
  * Use to read the values of Deno Deploy Context.
