@@ -99,14 +99,14 @@ export function* useAppHtml({
           href="/assets/prism-atom-one-dark.css"
           rel="preload"
           as="style"
-          // @ts-expect-error
+          // @ts-expect-error Property 'onload' does not exist on type 'HTMLLink'.deno-ts(2322)
           onload="this.rel='stylesheet'"
         />
         <link
           href="https://use.typekit.net/ugs0ewy.css"
           rel="preload"
           as="style"
-          // @ts-expect-error
+          // @ts-expect-error Property 'onload' does not exist on type 'HTMLLink'.deno-ts(2322)
           onload="this.rel='stylesheet'"
         />
         <noscript>
