@@ -52,7 +52,7 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   const readme = yield* call(async () => {
     try {
-      return await Deno.readTextFile(join(workspacePath, "README.md"))
+      return await Deno.readTextFile(join(workspacePath, "README.md"));
     } catch {
       return "Could not find a README.md file";
     }
@@ -85,15 +85,18 @@ export function* usePackage(workspace: string): Operation<Package> {
           return {
             id: exportHash(key, node),
             ...node,
-            MDXDoc: () => mod.default({})
+            MDXDoc: () => mod.default({}),
           };
         } catch (e) {
-          console.error(`Could not parse doc string for ${node.name} at ${node.location}`, e)
+          console.error(
+            `Could not parse doc string for ${node.name} at ${node.location}`,
+            e,
+          );
         }
       }
       return {
         id: exportHash(key, node),
-        ...node
+        ...node,
       };
     }));
   }
@@ -112,7 +115,7 @@ export function* usePackage(workspace: string): Operation<Package> {
 
 function exportHash(exportName: string, doc: DocNode): string {
   if (exportName === DEFAULT_MODULE_KEY) {
-    return doc.name
+    return doc.name;
   } else {
     return `${exportName}__${doc.name}`;
   }

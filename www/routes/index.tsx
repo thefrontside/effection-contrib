@@ -1,4 +1,3 @@
-
 import type { SitemapRoute } from "effection-www/plugins/sitemap.ts";
 import type { JSXElement } from "revolution";
 import { usePackages } from "../hooks/use-packages.ts";

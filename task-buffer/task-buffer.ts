@@ -36,19 +36,19 @@ export interface TaskBuffer extends Operation<void> {
 /**
  * Create a new `TaskBuffer` attached to the current scope. It will
  * not allow its number of active tasks to exceed `max`.
- * 
+ *
  * ```ts
  * import { run, sleep } from "effection";
  * import { useTaskBuffer } from "@effection-contrib/task-buffer";
- * 
+ *
  * await run(function*() {
  *  const buffer = yield* useTaskBuffer(2);
- * 
+ *
  *  yield* buffer.spawn(() => sleep(10));
  *  yield* buffer.spawn(() => sleep(10));
  *  // the next task won't execute until the above two tasks are completed
  *  yield* buffer.spawn(() => sleep(10));
- * 
+ *
  *  // will wait for all tasks to be complete
  *  yield* buffer;
  * });

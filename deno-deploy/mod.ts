@@ -1,6 +1,6 @@
 export {
   type DenoDeploy,
+  DenoDeployContext,
   initDenoDeploy,
   useDenoDeploy,
-  DenoDeployContext
 } from "./deno-deploy.ts";

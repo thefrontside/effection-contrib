@@ -33,11 +33,9 @@ export function API({ pkg }: DescriptionProps): JSXElement {
                     ))}
                   </>
                   <span class="token punctuation">)</span>:{" "}
-                  {node.functionDef.returnType ? (
-                    <TypeDef typeDef={node.functionDef.returnType} />
-                  ) : (
-                    <></>
-                  )}
+                  {node.functionDef.returnType
+                    ? <TypeDef typeDef={node.functionDef.returnType} />
+                    : <></>}
                 </span>
               );
               break;
@@ -119,19 +117,17 @@ function TypeRef({ typeRef }: TSTypeRefProps) {
   return (
     <>
       {typeRef.typeName}
-      {typeRef.typeParams ? (
-        <>
-          <span class="token operator">{"<"}</span>
+      {typeRef.typeParams
+        ? (
           <>
-            {typeRef.typeParams.map((tp) => (
-              <TypeDef typeDef={tp} />
-            ))}
+            <span class="token operator">{"<"}</span>
+            <>
+              {typeRef.typeParams.map((tp) => <TypeDef typeDef={tp} />)}
+            </>
+            <span class="token operator">{">"}</span>
           </>
-          <span class="token operator">{">"}</span>
-        </>
-      ) : (
-        <></>
-      )}
+        )
+        : <></>}
     </>
   );
 }

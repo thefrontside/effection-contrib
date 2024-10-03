@@ -11,9 +11,9 @@ export interface DenoDeploy {
    */
   deploymentId: string | undefined;
   /**
-   * It holds the region code of the region in which the deployment is running. 
+   * It holds the region code of the region in which the deployment is running.
    * You can use this variable to serve region-specific content.
-   * 
+   *
    * You can refer to the region code from the [regions page](https://docs.deno.com/deploy/manual/regions/).
    */
   region: string | undefined;
@@ -22,15 +22,15 @@ export interface DenoDeploy {
 export const DenoDeployContext = createContext<DenoDeploy>("deno-deploy", {
   isDenoDeploy: false,
   deploymentId: undefined,
-  region: undefined
+  region: undefined,
 });
 
 /**
  * Use to read the values of Deno Deploy Context.
- * 
+ *
  * ```ts
  * import { useDenoDeploy } from "@effection-contrib/deno-deploy";
- * 
+ *
  * function* () {
  *  const { isDenoDeploy } = yield* useDenoDeploy();
  * }
@@ -42,11 +42,11 @@ export function* useDenoDeploy(): Operation<DenoDeploy> {
 
 /**
  * Use at the root of your application to setup Deno Deploy context.
- * 
+ *
  * ```ts
  * import { main } from "effection";
  * import { initDenoDeploy } from "@effection-contrib/deno-deploy";
- * 
+ *
  * await main(function*() {
  *  yield* initDenoDeploy();
  * });

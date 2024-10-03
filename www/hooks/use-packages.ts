@@ -14,7 +14,7 @@ export function* usePackages(): Operation<Package[]> {
       workspaces.push(pkg);
     } catch (e) {
       if (!(e instanceof PrivatePackageError)) {
-        console.error(e)
+        console.error(e);
       }
     }
   }

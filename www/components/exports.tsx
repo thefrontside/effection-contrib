@@ -27,7 +27,12 @@ function PackageExport({ packageName, exportName, doc }: PackageExportOptions) {
   const exports = doc.flatMap((doc) => {
     if (doc.declarationKind === "export") {
       return [
-        <a class="underline text-slate-300 decoration-dotted hover:decoration-solid	" href={`#${doc.id}`}>{doc.name}</a>,
+        <a
+          class="underline text-slate-300 decoration-dotted hover:decoration-solid	"
+          href={`#${doc.id}`}
+        >
+          {doc.name}
+        </a>,
         ", ",
       ];
     } else {

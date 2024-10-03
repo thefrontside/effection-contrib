@@ -2,7 +2,7 @@ import type { Operation } from "effection";
 
 /**
  * This is an interface
- * 
+ *
  * ```ts
  * interface Message {
  *  text?: string;
@@ -15,13 +15,13 @@ export interface Message {
 
 /**
  * This is useMessage function
- * 
+ *
  * ```ts
  * function useMessage(text?: string): Operation<Message[]>
  * ```
- * @param text 
- * @returns 
+ * @param text
+ * @returns
  */
 export function* useMessages(text?: string): Operation<Message[]> {
-  return [{ text }]
+  return [{ text }];
 }

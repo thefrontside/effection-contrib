@@ -16,7 +16,7 @@ import { packageRoute } from "./routes/package.tsx";
 if (import.meta.main) {
   await main(function* () {
     yield* initDenoDeploy();
-    
+
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),

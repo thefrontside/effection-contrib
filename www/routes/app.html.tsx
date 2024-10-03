@@ -39,7 +39,7 @@ export function* useAppHtml({
         Contrib
       </span>
     </a>,
-  
+
     <a
       class="flex flex-row"
       href="https://github.com/thefrontside/effection"
