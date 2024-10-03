@@ -1,5 +1,5 @@
 import type { Operation } from "effection";
-import type { JSXChild } from "revolution";
+import type { JSXChild, JSXElement } from "revolution";
 import { useDenoDeploy } from "@effection-contrib/deno-deploy";
 
 import { useAbsoluteUrl } from "effection-www/plugins/rebase.ts";
@@ -28,7 +28,7 @@ export function* useAppHtml({
   let homeURL = yield* useAbsoluteUrl("/");
   let { isDenoDeploy } = yield* useDenoDeploy();
 
-  const navLinks: JSX.Element[] = [
+  const navLinks: JSXElement[] = [
     <a href="/docs/installation">Guides</a>,
     <a href="https://deno.land/x/effection/mod.ts">API</a>,
     <a
