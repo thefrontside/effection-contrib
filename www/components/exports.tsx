@@ -8,7 +8,9 @@ export function Exports({ pkg }: { pkg: Package }): JSXElement {
   return (
     <>
       <h2>Exports</h2>{" "}
-      <p class="text-slate-800">Click an export to jump to it's documentation.</p>
+      <p class="text-slate-800">
+        Click an export to jump to it's documentation.
+      </p>
       <>
         {Object.keys(pkg.docs).map((exportName) => (
           <PackageExport
