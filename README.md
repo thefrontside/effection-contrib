@@ -8,7 +8,7 @@ more than a few times are welcome.
 
 1. Create a directory
 2. Add a deno.json file with
-   `{ "name": "@effection-contrib/<you_package_name>", version: "0.1.0", exports: "./mod.ts" }`
+   `{ "name": "@effection-contrib/<you_package_name>", version: "0.1.0", "exports": "./mod.ts", "license": "MIT" }`
 3. Add a README.md (the first sentence of the README will be used as the
    description)
 4. Add your source code and export it from `mod.ts`

@@ -4,5 +4,6 @@
   "exports": "./mod.ts",
   "imports": {
     "tinyexec": "npm:tinyexec@0.3.0"
-  }
+  },
+  "license": "MIT"
 }
