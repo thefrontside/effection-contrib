@@ -5,7 +5,7 @@ import {
   type Operation,
   type Result,
   suspend,
-} from "effection";
+} from "npm:effection@3.0.3";
 
 export interface WithResolvers<T> {
   operation: Operation<T>;

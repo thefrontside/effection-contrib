@@ -11,7 +11,7 @@ import {
   spawn,
   type Task,
   useScope,
-} from "effection";
+} from "npm:effection@3.0.3";
 
 /**
  * Spawn operations, but only allow a certain number to be active at a
