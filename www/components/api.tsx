@@ -1,3 +1,4 @@
+import { call, type Operation } from "effection";
 import type { JSXElement } from "revolution";
 import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
 import type {
@@ -15,36 +16,37 @@ import {
   Optional,
   Punctuation,
 } from "./tokens.tsx";
+import { useMDX } from "../hooks/use-mdx.tsx";
 
 interface DescriptionProps {
   pkg: Package;
 }
 
-export function API({ pkg }: DescriptionProps): JSXElement {
-  return (
-    <>
-      {Object.keys(pkg.docs).flatMap((exportName) => {
-        const nodes = pkg.docs[exportName];
-        return nodes.map((node) => {
-          const { MDXDoc = () => <></> } = node;
+export function* API({ pkg }: DescriptionProps): Operation<JSXElement> {
+  const elements: JSXElement[] = [];
+  for (const exportName of Object.keys(pkg.docs)) {
+    const nodes = pkg.docs[exportName];
+    for (const node of nodes) {
+      const { MDXDoc = () => <></> } = node;
 
-          return (
-            <div class="my-5" id={node.id}>
-              <Type node={node} />
-              <MDXDoc />
-            </div>
-          );
-        });
-      })}
-    </>
-  );
+      elements.push(
+        (
+          <div class="my-5" id={node.id}>
+            {yield* Type({ node })}
+            <MDXDoc />
+          </div>
+        ),
+      );
+    }
+  }
+  return <>{elements}</>;
 }
 
 interface TypeProps {
   node: RenderableDocNode;
 }
 
-function Type({ node }: TypeProps) {
+function* Type({ node }: TypeProps): Operation<JSXElement> {
   switch (node.kind) {
     case "function":
       return (
@@ -73,12 +75,16 @@ function Type({ node }: TypeProps) {
             <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
           </h3>
           <Punctuation classes="text-lg">{" {"}</Punctuation>
-          <TSInterfaceDef interfaceDef={node.interfaceDef} />
+          {yield* TSInterfaceDef({ interfaceDef: node.interfaceDef })}
           <Punctuation classes="text-lg">{"}"}</Punctuation>
         </>
       );
     case "variable":
-      return <h3><TSVariableDef variableDef={node.variableDef} name={node.name} /></h3>
+      return (
+        <h3>
+          <TSVariableDef variableDef={node.variableDef} name={node.name} />
+        </h3>
+      );
     default:
       return (
         <h3>
@@ -100,18 +106,33 @@ function TSVariableDef(
   );
 }
 
-function TSInterfaceDef({ interfaceDef }: { interfaceDef: InterfaceDef }) {
+function* TSInterfaceDef(
+  { interfaceDef }: { interfaceDef: InterfaceDef },
+): Operation<JSXElement> {
+  const elements: JSXElement[] = [];
+  for (const property of interfaceDef.properties) {
+    elements.push(
+      <li class="my-0 border-l-2 first:-mt-5">
+        <div class="-mb-5">
+          {yield* call(function* (): Operation<JSXElement> {
+            if (property.jsDoc?.doc) {
+              const mod = yield* useMDX(property.jsDoc?.doc);
+              return mod.default();
+            }
+            return <></>;
+          })}
+        </div>
+        {property.name}
+        <Optional optional={property.optional} />
+        <Operator>{": "}</Operator>
+        {property.tsType ? <TypeDef typeDef={property.tsType} /> : <></>}
+        <Punctuation>{";"}</Punctuation>
+      </li>,
+    );
+  }
   return (
     <ul class="my-0 list-none pl-1">
-      {interfaceDef.properties.map((property) => (
-        <li class="my-0">
-          {property.name}
-          <Optional optional={property.optional} />
-          <Operator>{": "}</Operator>
-          {property.tsType ? <TypeDef typeDef={property.tsType} /> : <></>}
-          <Punctuation>{";"}</Punctuation>
-        </li>
-      ))}
+      {elements}
     </ul>
   );
 }
