@@ -5,9 +5,15 @@ export function ClassName({ children }: { children: JSXChild }): JSXElement {
 }
 
 export function Punctuation(
-  { children, classes, style }: { children: JSXChild; classes?: string; style?: string },
+  { children, classes, style }: {
+    children: JSXChild;
+    classes?: string;
+    style?: string;
+  },
 ): JSXElement {
-  return <span class={`token punctuation ${classes}`} style={style}>{children}</span>;
+  return (
+    <span class={`token punctuation ${classes}`} style={style}>{children}</span>
+  );
 }
 
 export function Operator({ children }: { children: JSXChild }): JSXElement {

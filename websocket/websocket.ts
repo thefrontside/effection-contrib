@@ -53,7 +53,7 @@ export interface WebSocketResource<T>
  * @param url - The URL of the target WebSocket server to connect to. The URL must use one of the following schemes: ws, wss, http, or https, and cannot include a URL fragment. If a relative URL is provided, it is relative to the base URL of the calling script. For more detail, see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket#url
  *
  * @param prototol - A single string or an array of strings representing the sub-protocol(s) that the client would like to use, in order of preference. If it is omitted, an empty array is used by default, i.e. []. For more details, see
- * 
+ *
  * @returns an operation yielding a {@link WebSocketResource}
  */
 export function useWebSocket<T>(
@@ -163,7 +163,4 @@ export function useWebSocket<T>(
   });
 }
 
-/**
- * @ignore until we can get jsdocs working for type unions
- */
 export type WebSocketData = Parameters<WebSocket["send"]>[0];

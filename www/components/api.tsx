@@ -33,9 +33,7 @@ export function* API({ pkg }: DescriptionProps): Operation<JSXElement> {
       elements.push(
         (
           <section id={node.id}>
-            <header>
-              {yield* Type({ node })}
-            </header>
+            {yield* Type({ node })}
             <div class="pl-2 -mt-5">
               <MDXDoc />
             </div>
@@ -55,23 +53,25 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
   switch (node.kind) {
     case "function":
       return (
-        <h3 class="inline-block" style="text-wrap: nowrap;">
-          <span class="language-ts code-highlight">
-            <Keyword>{node.kind}</Keyword>{" "}
-            <span class="token function">{node.name}</span>
-            <Punctuation>(</Punctuation>
-            <FunctionParams params={node.functionDef.params} />
-            <Punctuation>)</Punctuation>: {node.functionDef.returnType
-              ? <TypeDef typeDef={node.functionDef.returnType} />
-              : <></>}
-          </span>
-        </h3>
+        <header>
+          <h3 class="inline-block" style="text-wrap: nowrap;">
+            <span class="language-ts code-highlight">
+              <Keyword>{node.kind}</Keyword>{" "}
+              <span class="token function">{node.name}</span>
+              <Punctuation>(</Punctuation>
+              <FunctionParams params={node.functionDef.params} />
+              <Punctuation>)</Punctuation>: {node.functionDef.returnType
+                ? <TypeDef typeDef={node.functionDef.returnType} />
+                : <></>}
+            </span>
+          </h3>
+        </header>
       );
     case "interface":
       return (
-        <>
+        <header class="mb-10">
           {/** TODO(taras): figure out why text-nowrap is missing **/}
-          <h3 class="inline" style="text-wrap: nowrap;">
+          <h3 class="inline-block mb-0" style="text-wrap: nowrap;">
             <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
             {node.interfaceDef.typeParams.length > 0
               ? (
@@ -80,7 +80,7 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
                 />
               )
               : <></>}
-            {node.interfaceDef.extends
+            {node.interfaceDef.extends.length > 0
               ? (
                 <>
                   <Keyword>{" extends "}</Keyword>
@@ -92,25 +92,40 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
                 </>
               )
               : <></>}
+            <Punctuation classes="text-lg" style="text-wrap: nowrap;">
+              {" {"}
+            </Punctuation>
           </h3>
-          <Punctuation classes="text-lg" style="text-wrap: nowrap;">
-            {" {"}
-          </Punctuation>
           {yield* TSInterfaceDef({ interfaceDef: node.interfaceDef })}
           <Punctuation classes="text-lg">{"}"}</Punctuation>
-        </>
+        </header>
       );
     case "variable":
       return (
-        <h3>
-          <TSVariableDef variableDef={node.variableDef} name={node.name} />
-        </h3>
+        <header>
+          <h3 class="inline-block">
+            <TSVariableDef variableDef={node.variableDef} name={node.name} />
+          </h3>
+        </header>
+      );
+    case "typeAlias":
+      return (
+        <header>
+          <h3 class="inline-block">
+            <Keyword>{"type "}</Keyword>
+            {node.name}
+            <Operator>{" = "}</Operator>
+            <TypeDef typeDef={node.typeAliasDef.tsType} />
+          </h3>
+        </header>
       );
     default:
       return (
-        <h3>
-          <Keyword>{node.kind}</Keyword> {node.name}
-        </h3>
+        <header>
+          <h3 class="inline-block">
+            <Keyword>{node.kind}</Keyword> {node.name}
+          </h3>
+        </header>
       );
   }
 }
@@ -223,6 +238,20 @@ function TypeDef({ typeDef }: {
   typeDef: TsTypeDef;
 }) {
   switch (typeDef.kind) {
+    case "literal":
+      switch (typeDef.literal.kind) {
+        case "string":
+          return <span class="token string">"{typeDef.repr}"</span>;
+        case "number":
+          return <span class="token number">{typeDef.repr}</span>;
+        case "boolean":
+          return <span class="token boolean">{typeDef.repr}</span>;
+        case "bigInt":
+          return <span class="token number">{typeDef.repr}</span>;
+        default:
+          // TODO(taras): implement template
+          return <></>;
+      }
     case "keyword":
       if (["number", "string", "boolean", "bigint"].includes(typeDef.keyword)) {
         return <Builtin>{typeDef.keyword}</Builtin>;
@@ -236,18 +265,27 @@ function TypeDef({ typeDef }: {
     case "fnOrConstructor":
       if (typeDef.fnOrConstructor.constructor) {
         // TODO(taras): implement
-        return <></>
+        return <></>;
       } else {
         return (
           <>
             <Punctuation>(</Punctuation>
-              <FunctionParams params={typeDef.fnOrConstructor.params} />
+            <FunctionParams params={typeDef.fnOrConstructor.params} />
             <Punctuation>)</Punctuation>
             <Operator>{" => "}</Operator>
             <TypeDef typeDef={typeDef.fnOrConstructor.tsType} />
           </>
-        )
+        );
       }
+    case "indexedAccess":
+      return (
+        <>
+          <TypeDef typeDef={typeDef.indexedAccess.objType} />
+          <Punctuation>[</Punctuation>
+          <TypeDef typeDef={typeDef.indexedAccess.indexType} />
+          <Punctuation>]</Punctuation>
+        </>
+      );
     case "array":
       return (
         <>
