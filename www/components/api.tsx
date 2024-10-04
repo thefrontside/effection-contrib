@@ -1,4 +1,4 @@
-import type { JSXChild, JSXElement } from "revolution";
+import type { JSXElement } from "revolution";
 import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
 import type {
   InterfaceDef,
@@ -6,6 +6,14 @@ import type {
   TsTypeDef,
   TsTypeRefDef,
 } from "https://deno.land/x/deno_doc@0.125.0/types.d.ts";
+import {
+  Builtin,
+  ClassName,
+  Keyword,
+  Operator,
+  Optional,
+  Punctuation,
+} from "./tokens.tsx";
 
 interface DescriptionProps {
   pkg: Package;
@@ -119,11 +127,10 @@ interface TypeDefProps {
 }
 
 function TypeDef({ typeDef }: TypeDefProps) {
-  console.log({ typeDef })
   switch (typeDef.kind) {
     case "keyword":
       if (["number", "string", "boolean", "bigint"].includes(typeDef.keyword)) {
-        return <Builtin>{typeDef.keyword}</Builtin>
+        return <Builtin>{typeDef.keyword}</Builtin>;
       } else {
         return <Keyword>{typeDef.keyword}</Keyword>;
       }
@@ -176,34 +183,4 @@ function TypeRef({ typeRef }: TSTypeRefProps) {
         : <></>}
     </>
   );
-}
-
-function ClassName({ children }: { children: JSXChild }) {
-  return <span class="token class-name">{children}</span>;
-}
-
-function Punctuation(
-  { children, classes }: { children: JSXChild; classes?: string },
-) {
-  return <span class={`token punctuation ${classes}`}>{children}</span>;
-}
-
-function Operator({ children }: { children: JSXChild }) {
-  return <span class="token operator">{children}</span>;
-}
-
-function Keyword({ children }: { children: JSXChild }) {
-  return <span class="token keyword">{children}</span>;
-}
-
-function Builtin({ children }: { children: JSXChild }) {
-  return <span class="token builtin">{children}</span>;
-}
-
-function Optional({ optional }: { optional: boolean }) {
-  if (optional) {
-    return <Operator>?</Operator>;
-  } else {
-    return <></>;
-  }
 }

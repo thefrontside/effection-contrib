@@ -53,13 +53,14 @@ export function packageRoute(): SitemapRoute<JSXElement> {
       return (
         <AppHTML>
           <article class="prose">
-            <h1>{pkg.packageName}</h1>
-            <p>
-              <pkg.MDXDescription />
-            </p>
-            <div>
-              <Exports pkg={pkg} />
-            </div>
+            <header>
+              <h1>{pkg.packageName}</h1>
+              <p>
+                <pkg.MDXDescription />
+              </p>
+            </header>
+            <Exports pkg={pkg} />
+            <h2>Documentation</h2>
             <API pkg={pkg} />
           </article>
         </AppHTML>
