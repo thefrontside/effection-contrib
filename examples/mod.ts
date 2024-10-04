@@ -1,1 +1,1 @@
-export { type Message, useMessages } from "./use-message.ts";
+export * from "./use-message.ts";

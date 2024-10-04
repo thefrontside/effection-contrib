@@ -5,6 +5,7 @@ import type {
   InterfaceDef,
   ParamDef,
   TsTypeDef,
+  TsTypeParamDef,
   TsTypeRefDef,
   VariableDef,
 } from "https://deno.land/x/deno_doc@0.125.0/types.d.ts";
@@ -31,10 +32,14 @@ export function* API({ pkg }: DescriptionProps): Operation<JSXElement> {
 
       elements.push(
         (
-          <div class="my-5" id={node.id}>
-            {yield* Type({ node })}
-            <MDXDoc />
-          </div>
+          <section id={node.id}>
+            <header>
+              {yield* Type({ node })}
+            </header>
+            <div class="pl-2 -mt-5">
+              <MDXDoc />
+            </div>
+          </section>
         ),
       );
     }
@@ -50,18 +55,12 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
   switch (node.kind) {
     case "function":
       return (
-        <h3>
+        <h3 class="inline-block" style="text-wrap: nowrap;">
           <span class="language-ts code-highlight">
             <Keyword>{node.kind}</Keyword>{" "}
             <span class="token function">{node.name}</span>
             <Punctuation>(</Punctuation>
-            <>
-              {node.functionDef.params.map((param) => (
-                <TSParam
-                  param={param}
-                />
-              ))}
-            </>
+            <FunctionParams params={node.functionDef.params} />
             <Punctuation>)</Punctuation>: {node.functionDef.returnType
               ? <TypeDef typeDef={node.functionDef.returnType} />
               : <></>}
@@ -71,10 +70,32 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
     case "interface":
       return (
         <>
-          <h3 class="inline">
+          {/** TODO(taras): figure out why text-nowrap is missing **/}
+          <h3 class="inline" style="text-wrap: nowrap;">
             <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
+            {node.interfaceDef.typeParams.length > 0
+              ? (
+                <InterfaceTypeParams
+                  typeParams={node.interfaceDef.typeParams}
+                />
+              )
+              : <></>}
+            {node.interfaceDef.extends
+              ? (
+                <>
+                  <Keyword>{" extends "}</Keyword>
+                  <>
+                    {node.interfaceDef.extends.flatMap(
+                      (typeDef) => [<TypeDef typeDef={typeDef} />, ", "],
+                    ).slice(0, -1)}
+                  </>
+                </>
+              )
+              : <></>}
           </h3>
-          <Punctuation classes="text-lg">{" {"}</Punctuation>
+          <Punctuation classes="text-lg" style="text-wrap: nowrap;">
+            {" {"}
+          </Punctuation>
           {yield* TSInterfaceDef({ interfaceDef: node.interfaceDef })}
           <Punctuation classes="text-lg">{"}"}</Punctuation>
         </>
@@ -111,21 +132,53 @@ function* TSInterfaceDef(
 ): Operation<JSXElement> {
   const elements: JSXElement[] = [];
   for (const property of interfaceDef.properties) {
+    const jsDoc = yield* call(function* (): Operation<JSXElement | undefined> {
+      if (property.jsDoc?.doc) {
+        const mod = yield* useMDX(property.jsDoc?.doc);
+        return mod.default();
+      }
+    });
     elements.push(
-      <li class="my-0 border-l-2 first:-mt-5">
-        <div class="-mb-5">
-          {yield* call(function* (): Operation<JSXElement> {
-            if (property.jsDoc?.doc) {
-              const mod = yield* useMDX(property.jsDoc?.doc);
-              return mod.default();
-            }
-            return <></>;
-          })}
-        </div>
+      <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
+        {jsDoc
+          ? (
+            <div class="-mb-5">
+              {jsDoc}
+            </div>
+          )
+          : <></>}
         {property.name}
         <Optional optional={property.optional} />
         <Operator>{": "}</Operator>
         {property.tsType ? <TypeDef typeDef={property.tsType} /> : <></>}
+        <Punctuation>{";"}</Punctuation>
+      </li>,
+    );
+  }
+
+  for (const method of interfaceDef.methods) {
+    const jsDoc = yield* call(function* (): Operation<JSXElement | undefined> {
+      if (method.jsDoc?.doc) {
+        const mod = yield* useMDX(method.jsDoc?.doc);
+        return mod.default();
+      }
+    });
+    elements.push(
+      <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
+        {jsDoc
+          ? (
+            <div class="-mb-5">
+              {jsDoc}
+            </div>
+          )
+          : <></>}
+        {method.name}
+        <Optional optional={method.optional} />
+        <Punctuation>(</Punctuation>
+        <FunctionParams params={method.params} />
+        <Punctuation>)</Punctuation>
+        <Operator>{": "}</Operator>
+        {method.returnType ? <TypeDef typeDef={method.returnType} /> : <></>}
         <Punctuation>{";"}</Punctuation>
       </li>,
     );
@@ -137,21 +190,31 @@ function* TSInterfaceDef(
   );
 }
 
+function FunctionParams({ params }: { params: ParamDef[] }) {
+  return (
+    <>
+      {params.flatMap((param) => [
+        <TSParam
+          param={param}
+        />,
+        ", ",
+      ]).slice(0, -1)}
+    </>
+  );
+}
+
 function TSParam({ param }: {
   param: ParamDef;
 }) {
   if (param.kind === "identifier") {
-    switch (param.tsType?.kind) {
-      case "keyword":
-        return (
-          <>
-            {param.name}
-            <Optional optional={param.optional} />
-            <Operator>{": "}</Operator>
-            <Builtin>{param.tsType?.repr}</Builtin>
-          </>
-        );
-    }
+    return (
+      <>
+        {param.name}
+        <Optional optional={param.optional} />
+        <Operator>{": "}</Operator>
+        {param.tsType ? <TypeDef typeDef={param.tsType} /> : <></>}
+      </>
+    );
   }
   return <></>;
 }
@@ -170,6 +233,21 @@ function TypeDef({ typeDef }: {
       return <TypeRef typeRef={typeDef.typeRef} />;
     case "union":
       return <TypeDefUnion union={typeDef.union} />;
+    case "fnOrConstructor":
+      if (typeDef.fnOrConstructor.constructor) {
+        // TODO(taras): implement
+        return <></>
+      } else {
+        return (
+          <>
+            <Punctuation>(</Punctuation>
+              <FunctionParams params={typeDef.fnOrConstructor.params} />
+            <Punctuation>)</Punctuation>
+            <Operator>{" => "}</Operator>
+            <TypeDef typeDef={typeDef.fnOrConstructor.tsType} />
+          </>
+        )
+      }
     case "array":
       return (
         <>
@@ -205,12 +283,38 @@ function TypeRef({ typeRef }: {
           <>
             <Operator>{"<"}</Operator>
             <>
-              {typeRef.typeParams.map((tp) => <TypeDef typeDef={tp} />)}
+              {typeRef.typeParams.flatMap((
+                tp,
+              ) => [<TypeDef typeDef={tp} />, ", "]).slice(0, -1)}
             </>
             <Operator>{">"}</Operator>
           </>
         )
         : <></>}
+    </>
+  );
+}
+
+function InterfaceTypeParams(
+  { typeParams }: { typeParams: TsTypeParamDef[] },
+): JSXElement {
+  return (
+    <>
+      <Operator>{"<"}</Operator>
+      <>
+        {typeParams.flatMap((param) => {
+          return [
+            <>
+              {param.name}
+              {param.constraint
+                ? <TypeDef typeDef={param.constraint} />
+                : <></>}
+            </>,
+            <>,</>,
+          ];
+        }).slice(0, -1)}
+      </>
+      <Operator>{">"}</Operator>
     </>
   );
 }
