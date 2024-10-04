@@ -14,3 +14,9 @@ more than a few times are welcome.
 4. Add your source code and export it from `mod.ts`
 5. Add doc strings to your source code - they will be used for documentation on
    the site.
+
+## To publish a new project
+
+1. Member of [jsr.io/@effection-contrib](https://jsr.io/@effection-contrib) has
+   too add that project to the scope
+2. It should be publish on next merge to main
