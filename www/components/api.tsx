@@ -1,6 +1,7 @@
-import type { JSXElement } from "revolution";
-import type { Package } from "../hooks/use-package.tsx";
+import type { JSXChild, JSXElement } from "revolution";
+import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
 import type {
+  InterfaceDef,
   ParamDef,
   TsTypeDef,
   TsTypeRefDef,
@@ -18,53 +19,77 @@ export function API({ pkg }: DescriptionProps): JSXElement {
         return nodes.map((node) => {
           const { MDXDoc = () => <></> } = node;
 
-          let title = <></>;
-          switch (node.kind) {
-            case "function":
-              title = (
-                <span class="language-ts code-highlight">
-                  <span class="token keyword">function</span>{" "}
-                  <span class="token function">{node.name}</span>
-                  <span class="token punctuation">(</span>
-                  <>
-                    {node.functionDef.params.map((param) => (
-                      <TSParam param={param} />
-                    ))}
-                  </>
-                  <span class="token punctuation">)</span>:{" "}
-                  {node.functionDef.returnType
-                    ? <TypeDef typeDef={node.functionDef.returnType} />
-                    : <></>}
-                </span>
-              );
-              break;
-            case "interface":
-              title = (
-                <>
-                  <span class="token keyword">{node.kind}</span>{" "}
-                  <span class="token class-name">{node.name}</span>
-                </>
-              );
-              break;
-            default:
-              title = (
-                <>
-                  <span class="token keyword">{node.kind}</span> {node.name}
-                </>
-              );
-          }
-
           return (
-            <div class="my-5">
-              <h3 class="text-lg" id={node.id}>
-                {title}
-              </h3>
+            <div class="my-5" id={node.id}>
+              <Type node={node} />
               <MDXDoc />
             </div>
           );
         });
       })}
     </>
+  );
+}
+
+interface TypeProps {
+  node: RenderableDocNode;
+}
+
+function Type({ node }: TypeProps) {
+  switch (node.kind) {
+    case "function":
+      return (
+        <h3 class="text-lg">
+          <span class="language-ts code-highlight">
+            <Keyword>{node.kind}</Keyword>{" "}
+            <span class="token function">{node.name}</span>
+            <Punctuation>(</Punctuation>
+            <>
+              {node.functionDef.params.map((param) => (
+                <TSParam
+                  param={param}
+                />
+              ))}
+            </>
+            <Punctuation>)</Punctuation>: {node.functionDef.returnType
+              ? <TypeDef typeDef={node.functionDef.returnType} />
+              : <></>}
+          </span>
+        </h3>
+      );
+    case "interface":
+      return (
+        <>
+          <h3 class="inline">
+            <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
+          </h3>
+          <Punctuation classes="text-lg">{" {"}</Punctuation>
+          <TSInterfaceDef interfaceDef={node.interfaceDef} />
+          <Punctuation classes="text-lg">{"}"}</Punctuation>
+        </>
+      );
+    default:
+      return (
+        <h3 class="text-lg">
+          <Keyword>{node.kind}</Keyword> {node.name}
+        </h3>
+      );
+  }
+}
+
+function TSInterfaceDef({ interfaceDef }: { interfaceDef: InterfaceDef }) {
+  return (
+    <ul class="my-0 list-none pl-1">
+      {interfaceDef.properties.map((property) => (
+        <li class="my-0">
+          {property.name}
+          <Optional optional={property.optional} />
+          <Operator>{": "}</Operator>
+          {property.tsType ? <TypeDef typeDef={property.tsType} /> : <></>}
+          <Punctuation>{";"}</Punctuation>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -79,9 +104,9 @@ function TSParam({ param }: TSParamProps) {
         return (
           <>
             {param.name}
-            {param.optional ? <span class="token operator">?</span> : ""}
-            <span class="token operator">{": "}</span>
-            <span class="token builtin">{param.tsType?.repr}</span>
+            <Optional optional={param.optional} />
+            <Operator>{": "}</Operator>
+            <Builtin>{param.tsType?.repr}</Builtin>
           </>
         );
     }
@@ -94,9 +119,18 @@ interface TypeDefProps {
 }
 
 function TypeDef({ typeDef }: TypeDefProps) {
+  console.log({ typeDef })
   switch (typeDef.kind) {
+    case "keyword":
+      if (["number", "string", "boolean", "bigint"].includes(typeDef.keyword)) {
+        return <Builtin>{typeDef.keyword}</Builtin>
+      } else {
+        return <Keyword>{typeDef.keyword}</Keyword>;
+      }
     case "typeRef":
       return <TypeRef typeRef={typeDef.typeRef} />;
+    case "union":
+      return <TypeDefUnion union={typeDef.union} />;
     case "array":
       return (
         <>
@@ -106,6 +140,19 @@ function TypeDef({ typeDef }: TypeDefProps) {
       );
   }
   return <></>;
+}
+
+function TypeDefUnion({ union }: { union: TsTypeDef[] }) {
+  return (
+    <>
+      {union.flatMap((typeDef, index) => (
+        <>
+          <TypeDef typeDef={typeDef} />
+          {(index + 1) < union.length ? <Operator>{" | "}</Operator> : <></>}
+        </>
+      ))}
+    </>
+  );
 }
 
 interface TSTypeRefProps {
@@ -119,14 +166,44 @@ function TypeRef({ typeRef }: TSTypeRefProps) {
       {typeRef.typeParams
         ? (
           <>
-            <span class="token operator">{"<"}</span>
+            <Operator>{"<"}</Operator>
             <>
               {typeRef.typeParams.map((tp) => <TypeDef typeDef={tp} />)}
             </>
-            <span class="token operator">{">"}</span>
+            <Operator>{">"}</Operator>
           </>
         )
         : <></>}
     </>
   );
+}
+
+function ClassName({ children }: { children: JSXChild }) {
+  return <span class="token class-name">{children}</span>;
+}
+
+function Punctuation(
+  { children, classes }: { children: JSXChild; classes?: string },
+) {
+  return <span class={`token punctuation ${classes}`}>{children}</span>;
+}
+
+function Operator({ children }: { children: JSXChild }) {
+  return <span class="token operator">{children}</span>;
+}
+
+function Keyword({ children }: { children: JSXChild }) {
+  return <span class="token keyword">{children}</span>;
+}
+
+function Builtin({ children }: { children: JSXChild }) {
+  return <span class="token builtin">{children}</span>;
+}
+
+function Optional({ optional }: { optional: boolean }) {
+  if (optional) {
+    return <Operator>?</Operator>;
+  } else {
+    return <></>;
+  }
 }

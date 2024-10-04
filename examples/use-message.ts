@@ -6,11 +6,13 @@ import type { Operation } from "effection";
  * ```ts
  * interface Message {
  *  text?: string;
+ *  code: number | undefined;
  * }
  * ```
  */
 export interface Message {
   text?: string;
+  code: number | undefined;
 }
 
 /**
@@ -23,5 +25,5 @@ export interface Message {
  * @returns
  */
 export function* useMessages(text?: string): Operation<Message[]> {
-  return [{ text }];
+  return [{ text, code: undefined }];
 }
