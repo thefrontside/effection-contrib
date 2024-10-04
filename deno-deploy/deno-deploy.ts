@@ -19,6 +19,19 @@ export interface DenoDeploy {
   region: string | undefined;
 }
 
+/**
+ * Context used to access DenoDeploy value
+ * 
+ * ```ts
+ * function*() {
+ *  const { 
+ *    isDenoDeploy, 
+ *    deploymentId,
+ *    region
+ *  } = yield* DenoDeployContext;
+ * }
+ * ```
+ */
 export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>(
   "deno-deploy",
   {

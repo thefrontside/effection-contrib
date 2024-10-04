@@ -5,6 +5,7 @@ import type {
   ParamDef,
   TsTypeDef,
   TsTypeRefDef,
+  VariableDef,
 } from "https://deno.land/x/deno_doc@0.125.0/types.d.ts";
 import {
   Builtin,
@@ -47,7 +48,7 @@ function Type({ node }: TypeProps) {
   switch (node.kind) {
     case "function":
       return (
-        <h3 class="text-lg">
+        <h3>
           <span class="language-ts code-highlight">
             <Keyword>{node.kind}</Keyword>{" "}
             <span class="token function">{node.name}</span>
@@ -76,13 +77,27 @@ function Type({ node }: TypeProps) {
           <Punctuation classes="text-lg">{"}"}</Punctuation>
         </>
       );
+    case "variable":
+      return <h3><TSVariableDef variableDef={node.variableDef} name={node.name} /></h3>
     default:
       return (
-        <h3 class="text-lg">
+        <h3>
           <Keyword>{node.kind}</Keyword> {node.name}
         </h3>
       );
   }
+}
+
+function TSVariableDef(
+  { variableDef, name }: { variableDef: VariableDef; name: string },
+) {
+  return (
+    <>
+      <Keyword>{variableDef.kind}</Keyword> {name}
+      <Operator>:</Operator>{" "}
+      {variableDef.tsType ? <TypeDef typeDef={variableDef.tsType} /> : <></>}
+    </>
+  );
 }
 
 function TSInterfaceDef({ interfaceDef }: { interfaceDef: InterfaceDef }) {
@@ -101,11 +116,9 @@ function TSInterfaceDef({ interfaceDef }: { interfaceDef: InterfaceDef }) {
   );
 }
 
-interface TSParamProps {
+function TSParam({ param }: {
   param: ParamDef;
-}
-
-function TSParam({ param }: TSParamProps) {
+}) {
   if (param.kind === "identifier") {
     switch (param.tsType?.kind) {
       case "keyword":
@@ -122,11 +135,9 @@ function TSParam({ param }: TSParamProps) {
   return <></>;
 }
 
-interface TypeDefProps {
+function TypeDef({ typeDef }: {
   typeDef: TsTypeDef;
-}
-
-function TypeDef({ typeDef }: TypeDefProps) {
+}) {
   switch (typeDef.kind) {
     case "keyword":
       if (["number", "string", "boolean", "bigint"].includes(typeDef.keyword)) {
@@ -162,11 +173,9 @@ function TypeDefUnion({ union }: { union: TsTypeDef[] }) {
   );
 }
 
-interface TSTypeRefProps {
+function TypeRef({ typeRef }: {
   typeRef: TsTypeRefDef;
-}
-
-function TypeRef({ typeRef }: TSTypeRefProps) {
+}) {
   return (
     <>
       {typeRef.typeName}
