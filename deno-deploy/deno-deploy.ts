@@ -1,4 +1,8 @@
-import { type Context, createContext, type Operation } from "npm:effection@3.0.3";
+import {
+  type Context,
+  createContext,
+  type Operation,
+} from "npm:effection@3.0.3";
 
 export interface DenoDeploy {
   /**
