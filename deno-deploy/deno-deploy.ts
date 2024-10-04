@@ -12,13 +12,25 @@ export interface DenoDeploy {
   deploymentId: string | undefined;
   /**
    * It holds the region code of the region in which the deployment is running.
-   * You can use this variable to serve region-specific content.
-   *
-   * You can refer to the region code from the [regions page](https://docs.deno.com/deploy/manual/regions/).
+   * You can use this variable to serve region-specific content. You can refer to the 
+   * region code from the [regions page](https://docs.deno.com/deploy/manual/regions/).
    */
   region: string | undefined;
 }
 
+/**
+ * Context used to access DenoDeploy value
+ *
+ * ```ts
+ * function*() {
+ *  const {
+ *    isDenoDeploy,
+ *    deploymentId,
+ *    region
+ *  } = yield* DenoDeployContext;
+ * }
+ * ```
+ */
 export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>(
   "deno-deploy",
   {
