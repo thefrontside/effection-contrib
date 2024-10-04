@@ -1,0 +1,35 @@
+name: Publish
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-matrix:
+    name: Generate Job Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - run: deno task set-publish-matrix
+        working-directory: www
+        id: set-matrix
+
+  test:
+    name: Publish ${{ matrix.workspace }} to JSR
+    runs-on: ubuntu-latest
+    if: needs.generate-matrix.outputs.matrix != ''
+    needs: [generate-matrix]
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix: ${{fromJSON(needs.generate-matrix.outputs.matrix)}}
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npx jsr publish
+        working-directory: ${{ matrix.workspace }}
