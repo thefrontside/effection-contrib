@@ -29,6 +29,7 @@
     "./deno-deploy",
     "./task-buffer",
     "./tinyexec",
-    "./examples"
+    "./examples",
+    "./websocket"
   ]
 }
