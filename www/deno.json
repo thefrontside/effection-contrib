@@ -6,9 +6,8 @@
     "dev": "deno run  -A --watch main.ts"
   },
   "compilerOptions": {
-    "jsx": "react",
-    "jsxFactory": "React.createElement",
-    "jsxFragmentFactory": "React.Fragment"
+    "jsx": "react-jsx",
+    "jsxImportSource": "revolution"
   },
   "private": true,
   "imports": {
