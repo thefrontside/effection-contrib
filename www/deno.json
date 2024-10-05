@@ -5,6 +5,11 @@
   "tasks": {
     "dev": "deno run  -A --watch main.ts"
   },
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment"
+  },
   "private": true,
   "imports": {
     "effection": "npm:effection@3.0.3",
