@@ -44,7 +44,9 @@
     "exclude": [
       "**/node_modules"
     ],
-    "include": ["**/"],
+    "include": [
+      "**/"
+    ],
     "entrypoint": "main.ts"
   }
 }
