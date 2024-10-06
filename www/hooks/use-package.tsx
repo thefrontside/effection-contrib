@@ -35,13 +35,10 @@ const DenoJson = z.object({
 export const DEFAULT_MODULE_KEY = ".";
 
 export function* usePackage(workspace: string): Operation<Package> {
-  const workspacePath = resolve(
-    import.meta.dirname ?? "",
-    `../../${workspace}`,
-  );
+  const workspacePath = resolve(Deno.cwd(), workspace);
 
   const config: { default: unknown } = yield* call(
-    () => import(`../../${workspace}/deno.json`, { with: { type: "json" } }),
+    () => import(`${workspacePath}/deno.json`, { with: { type: "json" } }),
   );
 
   const denoJson = DenoJson.parse(config.default);

@@ -14,6 +14,8 @@ export function* usePackages(): Operation<Package[]> {
     }
   });
 
+  console.log(`Found ${JSON.stringify(root?.default.workspace)}`);
+
   const workspaces: Package[] = [];
   for (let workspace of root?.default?.workspace ?? []) {
     try {
