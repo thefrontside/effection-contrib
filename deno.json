@@ -1,8 +1,14 @@
 {
+  "tasks": {
+    "dev": "deno run  -A --watch main.ts"
+  },
   "imports": {
     "effection": "npm:effection",
     "bdd": "jsr:@std/testing/bdd",
-    "expect": "jsr:@std/expect"
+    "expect": "jsr:@std/expect",
+    "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
+    "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts",
+    "effection-www/": "https://raw.githubusercontent.com/thefrontside/effection/4982887c1677b847d256402e8709f2b1d49437e6/www/"
   },
   "compilerOptions": {
     "lib": [
@@ -25,7 +31,6 @@
     }
   },
   "workspace": [
-    "./www",
     "./deno-deploy",
     "./task-buffer",
     "./tinyexec",
