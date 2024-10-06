@@ -42,17 +42,10 @@
   "deploy": {
     "project": "aa1dbfaa-d7c1-49d7-b514-69e1d8344f95",
     "exclude": [
-      "**/node_modules",
       "**/node_modules"
     ],
     "include": [
-      "deno.json",
-      "./deno-deploy/",
-      "./task-buffer/",
-      "./tinyexec/",
-      "./websocket/",
-      "./www",
-      "./main.ts"
+      "."
     ],
     "entrypoint": "main.ts"
   }
