@@ -41,7 +41,7 @@ export function* usePackage(workspace: string): Operation<Package> {
     async () =>
       JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
   );
-  
+
   if (config.private === true) {
     throw new PrivatePackageError(workspace);
   }
