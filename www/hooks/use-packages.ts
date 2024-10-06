@@ -5,7 +5,9 @@ import { PrivatePackageError } from "../errors.ts";
 export function* usePackages(): Operation<Package[]> {
   const root = yield* call(async () => {
     try {
-      const denoJson = await import("../../deno.json", { with: { type: "json" } })
+      const denoJson = await import("../../deno.json", {
+        with: { type: "json" },
+      });
       return denoJson;
     } catch (e) {
       console.error(e);
