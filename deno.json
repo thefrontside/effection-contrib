@@ -47,6 +47,6 @@
     "include": [
       "."
     ],
-    "entrypoint": "main.ts"
+    "entrypoint": "www/main.ts"
   }
 }
