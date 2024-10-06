@@ -18,6 +18,7 @@ import {
   Punctuation,
 } from "./tokens.tsx";
 import { useMDX } from "../hooks/use-mdx.tsx";
+import { useMarkdown } from "../hooks/use-markdown.tsx";
 
 interface DescriptionProps {
   pkg: Package;
@@ -147,12 +148,9 @@ function* TSInterfaceDef(
 ): Operation<JSXElement> {
   const elements: JSXElement[] = [];
   for (const property of interfaceDef.properties) {
-    const jsDoc = yield* call(function* (): Operation<JSXElement | undefined> {
-      if (property.jsDoc?.doc) {
-        const mod = yield* useMDX(property.jsDoc?.doc);
-        return mod.default();
-      }
-    });
+    const jsDoc = property.jsDoc?.doc
+      ? yield* useMarkdown(property.jsDoc?.doc)
+      : undefined;
     elements.push(
       <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
         {jsDoc

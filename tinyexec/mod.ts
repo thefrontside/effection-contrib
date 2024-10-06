@@ -1,1 +1,1 @@
-export { x } from "./tinyexec.ts";
+export * from "./tinyexec.ts";

@@ -6,6 +6,7 @@ import type { RoutePath, SitemapRoute } from "effection-www/plugins/sitemap.ts";
 import { usePackages } from "../hooks/use-packages.ts";
 import { Exports } from "../components/exports.tsx";
 import { API } from "../components/api.tsx";
+import { useMarkdown } from "../hooks/use-markdown.tsx";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
@@ -54,13 +55,12 @@ export function packageRoute(): SitemapRoute<JSXElement> {
         <AppHTML>
           <article class="prose">
             <header>
-              <h1>{pkg.packageName}</h1>
-              <p>
-                <pkg.MDXDescription />
-              </p>
+              <>
+                {yield* useMarkdown(pkg.readme)}
+              </>
             </header>
             <Exports pkg={pkg} />
-            <h2 class="mb-0">Documentation</h2>
+            <h2 class="mb-0">API</h2>
             {yield* API({ pkg })}
           </article>
         </AppHTML>
