@@ -38,10 +38,10 @@ export function* usePackage(workspace: string): Operation<Package> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
   const config: { default: unknown } = yield* call(
-    () => import(`${workspacePath}/deno.json`, { with: { type: "json" } }),
+    async () => JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
   );
 
-  const denoJson = DenoJson.parse(config.default);
+  const denoJson = DenoJson.parse(config);
 
   if (denoJson.private === true) {
     throw new PrivatePackageError(workspace);
