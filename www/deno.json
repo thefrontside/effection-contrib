@@ -3,7 +3,8 @@
   "exports": "./main.ts",
   "version": "0.1.0",
   "tasks": {
-    "dev": "deno run  -A --watch main.ts"
+    "dev": "deno run  -A --watch main.ts",
+    "set-publish-matrix": "deno run -A tasks/publish-matrix.ts"
   },
   "private": true,
   "imports": {
