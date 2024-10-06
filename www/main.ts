@@ -1,6 +1,6 @@
 import { main, suspend } from "effection";
 import { createRevolution } from "revolution";
-import { initDenoDeploy } from "@effection-contrib/deno-deploy";
+import { initDenoDeploy } from "../deno-deploy/mod.ts";
 
 import { config } from "effection-www/tailwind.config.ts";
 import { route, sitemapPlugin } from "effection-www/plugins/sitemap.ts";

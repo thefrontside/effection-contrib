@@ -2,6 +2,7 @@ import type { SitemapRoute } from "effection-www/plugins/sitemap.ts";
 import type { JSXElement } from "revolution";
 import { usePackages } from "../hooks/use-packages.ts";
 import { useAppHtml } from "./app.html.tsx";
+import { Package } from "../hooks/use-package.tsx";
 
 export function indexRoute(): SitemapRoute<JSXElement> {
   return {
@@ -18,7 +19,12 @@ export function indexRoute(): SitemapRoute<JSXElement> {
         pageTitle: "Contribs | Effection",
       });
 
-      const packages = yield* usePackages();
+      let packages: Package[] = [];
+      try {
+        packages = yield* usePackages();
+      } catch (e) {
+        console.log("Could not read packages", e);
+      }
 
       return (
         <AppHTML>

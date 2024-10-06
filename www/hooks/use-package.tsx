@@ -35,20 +35,18 @@ const DenoJson = z.object({
 export const DEFAULT_MODULE_KEY = ".";
 
 export function* usePackage(workspace: string): Operation<Package> {
-  const workspacePath = resolve(
-    import.meta.dirname ?? "",
-    `../../${workspace}`,
+  const workspacePath = resolve(Deno.cwd(), workspace);
+
+  const config: { private?: boolean } = yield* call(
+    async () =>
+      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
   );
 
-  const config: { default: unknown } = yield* call(
-    () => import(`../../${workspace}/deno.json`, { with: { type: "json" } }),
-  );
-
-  const denoJson = DenoJson.parse(config.default);
-
-  if (denoJson.private === true) {
+  if (config.private === true) {
     throw new PrivatePackageError(workspace);
   }
+
+  const denoJson = DenoJson.parse(config);
 
   const readme = yield* call(async () => {
     try {
