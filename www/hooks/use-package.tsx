@@ -37,16 +37,16 @@ export const DEFAULT_MODULE_KEY = ".";
 export function* usePackage(workspace: string): Operation<Package> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
-  const config: { default: unknown } = yield* call(
+  const config: { private?: boolean } = yield* call(
     async () =>
       JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
   );
-
-  const denoJson = DenoJson.parse(config);
-
-  if (denoJson.private === true) {
+  
+  if (config.private === true) {
     throw new PrivatePackageError(workspace);
   }
+
+  const denoJson = DenoJson.parse(config);
 
   const readme = yield* call(async () => {
     try {
