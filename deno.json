@@ -27,7 +27,10 @@
   },
   "lint": {
     "rules": {
-      "exclude": ["prefer-const", "require-yield"]
+      "exclude": [
+        "prefer-const",
+        "require-yield"
+      ]
     }
   },
   "workspace": [
@@ -35,5 +38,13 @@
     "./task-buffer",
     "./tinyexec",
     "./websocket"
-  ]
+  ],
+  "deploy": {
+    "project": "aa1dbfaa-d7c1-49d7-b514-69e1d8344f95",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": ["**/"],
+    "entrypoint": "main.ts"
+  }
 }
