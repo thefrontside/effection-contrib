@@ -38,7 +38,8 @@ export function* usePackage(workspace: string): Operation<Package> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
   const config: { default: unknown } = yield* call(
-    async () => JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
+    async () =>
+      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
   );
 
   const denoJson = DenoJson.parse(config);
