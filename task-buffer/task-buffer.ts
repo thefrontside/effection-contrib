@@ -1,17 +1,16 @@
+import { Err, Ok, type Result } from "effection";
+
 import {
-  action,
   createChannel,
-  Err,
-  Ok,
   type Operation,
   type Resolve,
   resource,
-  type Result,
   sleep,
   spawn,
   type Task,
   useScope,
-} from "effection";
+  withResolvers,
+} from "npm:effection@4.0.0-alpha.3";
 
 /**
  * Spawn operations, but only allow a certain number to be active at a
@@ -72,17 +71,14 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
     yield* spawn(function* () {
       while (true) {
         if (buffer.size < max) {
-          let { value: request } = yield* requests.next();
-          // TODO: this is a bug in Effection.
-          // when an error occurs, this is still running.
-          yield* sleep(0);
+          const { value: request } = yield* requests.next();
           let task = scope.run(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
             try {
               yield* output.send(Ok(yield* task));
             } catch (error) {
-              yield* output.send(Err(error));
+              yield* output.send(Err(error as Error));
             } finally {
               buffer.delete(task);
             }
@@ -100,15 +96,19 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
           for (let task of buffer.values()) {
             yield* task;
           }
+          yield* sleep(0);
         }
       },
-      spawn: (operation) =>
-        action(function* (resolve) {
-          yield* input.send({
-            operation,
-            resolve: resolve as Resolve<Task<unknown>>,
-          });
-        }),
+      spawn: function* <T>(operation: () => Operation<T>) {
+        const resolvers = withResolvers<Task<T>>();
+
+        yield* input.send({
+          operation,
+          resolve: resolvers.resolve as Resolve<Task<unknown>>,
+        });
+
+        return yield* resolvers.operation;
+      },
     });
   });
 }
