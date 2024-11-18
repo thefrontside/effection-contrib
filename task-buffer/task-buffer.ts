@@ -99,14 +99,14 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
         }
       },
       *spawn<T>(operation: () => Operation<T>) {
-        const resolvers = withResolvers<Task<T>>();
+        let spawned = withResolvers<Task<T>>();
 
         yield* input.send({
           operation,
-          resolve: resolvers.resolve as Resolve<Task<unknown>>,
+          resolve: spawned.resolve as Resolve<Task<unknown>>,
         });
 
-        return yield* resolvers.operation;
+        return yield* spawned.operation;
       },
     });
   });
