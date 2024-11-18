@@ -99,7 +99,7 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
           yield* sleep(0);
         }
       },
-      spawn: function* <T>(operation: () => Operation<T>) {
+      *spawn<T>(operation: () => Operation<T>) {
         const resolvers = withResolvers<Task<T>>();
 
         yield* input.send({
