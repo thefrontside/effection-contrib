@@ -1,5 +1,3 @@
-import { Err, Ok, type Result } from "effection";
-
 import {
   createChannel,
   type Operation,
@@ -60,7 +58,7 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
   return resource(function* (provide) {
     let input = createChannel<SpawnRequest<unknown>, never>();
 
-    let output = createChannel<Result<unknown>, never>();
+    let output = createChannel<void, never>();
 
     let buffer = new Set<Task<unknown>>();
 
@@ -72,15 +70,16 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
       while (true) {
         if (buffer.size < max) {
           const { value: request } = yield* requests.next();
-          let task = scope.run(request.operation);
+          let task = yield* scope.spawn(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
             try {
-              yield* output.send(Ok(yield* task));
-            } catch (error) {
-              yield* output.send(Err(error as Error));
+              yield* task;
+            } catch (_) {
+              // all we care about is that the task settled.
             } finally {
               buffer.delete(task);
+              yield* output.send();
             }
           });
           request.resolve(task);
