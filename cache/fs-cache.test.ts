@@ -50,6 +50,22 @@ describe("FSCache", () => {
     expect(await readTmpFile("hello.jsonl")).toBe('"1"\n"2"\n');
   });
 
+  describe("clearing cache", () => {
+    beforeEach(async () => {
+      await writeTmpFile("hello.jsonl", "world\n");
+    });
+    it("clears cache when called clear", async () => {
+      await run(function*() {
+        yield* cache.clear();
+      });
+      const entries = [];
+      for await (const dirEntry of Deno.readDir(tmpDir)) {
+        entries.push(dirEntry);
+      }
+      expect(entries).toHaveLength(0);
+    });
+  });
+
   describe("reading content of a file", () => {
     beforeEach(async () => {
        await Deno.writeTextFile(join(tmpDir, 'test.jsonl'), `1\n2\n3\n`);
