@@ -1,17 +1,14 @@
 import {
-  action,
   createChannel,
-  Err,
-  Ok,
   type Operation,
   type Resolve,
   resource,
-  type Result,
   sleep,
   spawn,
   type Task,
   useScope,
-} from "effection";
+  withResolvers,
+} from "npm:effection@4.0.0-alpha.3";
 
 /**
  * Spawn operations, but only allow a certain number to be active at a
@@ -61,7 +58,7 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
   return resource(function* (provide) {
     let input = createChannel<SpawnRequest<unknown>, never>();
 
-    let output = createChannel<Result<unknown>, never>();
+    let output = createChannel<void, never>();
 
     let buffer = new Set<Task<unknown>>();
 
@@ -72,19 +69,17 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
     yield* spawn(function* () {
       while (true) {
         if (buffer.size < max) {
-          let { value: request } = yield* requests.next();
-          // TODO: this is a bug in Effection.
-          // when an error occurs, this is still running.
-          yield* sleep(0);
-          let task = scope.run(request.operation);
+          const { value: request } = yield* requests.next();
+          let task = yield* scope.spawn(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
             try {
-              yield* output.send(Ok(yield* task));
-            } catch (error) {
-              yield* output.send(Err(error));
+              yield* task;
+            } catch (_) {
+              // all we care about is that the task settled.
             } finally {
               buffer.delete(task);
+              yield* output.send();
             }
           });
           request.resolve(task);
@@ -100,15 +95,19 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
           for (let task of buffer.values()) {
             yield* task;
           }
+          yield* sleep(0);
         }
       },
-      spawn: (operation) =>
-        action(function* (resolve) {
-          yield* input.send({
-            operation,
-            resolve: resolve as Resolve<Task<unknown>>,
-          });
-        }),
+      *spawn<T>(operation: () => Operation<T>) {
+        let spawned = withResolvers<Task<T>>();
+
+        yield* input.send({
+          operation,
+          resolve: spawned.resolve as Resolve<Task<unknown>>,
+        });
+
+        return yield* spawned.operation;
+      },
     });
   });
 }

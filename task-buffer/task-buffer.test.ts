@@ -1,4 +1,4 @@
-import { run, sleep, spawn, type Task } from "effection";
+import { run, sleep, spawn, type Task } from "npm:effection@4.0.0-alpha.3";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { useTaskBuffer } from "./task-buffer.ts";
@@ -37,6 +37,7 @@ describe("TaskBuffer", () => {
           finished++;
         });
       }
+
       expect(finished).toEqual(0);
 
       yield* buffer;
