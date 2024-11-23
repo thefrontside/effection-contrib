@@ -1,6 +1,6 @@
 import { JSONLinesParseStream } from "https://deno.land/x/jsonlines@v1.2.2/mod.ts";
 import { emptyDir, exists, walk } from "jsr:@std/fs@1.0.4";
-import { basename, dirname, globToRegExp, join } from "jsr:@std/path@1.0.6";
+import { basename, dirname, globToRegExp, join, toFileUrl } from "jsr:@std/path@1.0.6";
 import {
   call,
   createQueue,
@@ -40,7 +40,11 @@ function* stat(
 }
 
 export class FSCache implements Cache {
-  constructor(public location: URL) {}
+  location: URL;
+
+  constructor(location: URL | string) {
+    this.location = toFileUrl(`${location}`.replace(/\/?$/, '/'));
+  }
 
   *has(key: string) {
     const location = new URL(`./${key}.jsonl`, this.location);
@@ -71,11 +75,24 @@ export class FSCache implements Cache {
 
     yield* mkdir(dirname(location.pathname), { recursive: true });
 
+    const file = yield* call(() =>
+      Deno.open(location, {
+        create: true,
+        write: true,
+      })
+    );
+
     try {
-      yield* stat(location.pathname);
-    } catch {
-      yield* writeFile(location.pathname, "");
+      yield* call(() =>
+        file.write(new TextEncoder().encode(`${JSON.stringify(data)}\n`))
+      );
+    } finally {
+      file.close();
     }
+  }
+
+  *append(key: string, data: unknown) {
+    const location = new URL(`./${key}.jsonl`, this.location);
 
     const file = yield* call(() =>
       Deno.open(location, {
@@ -94,8 +111,9 @@ export class FSCache implements Cache {
 
   *find<T>(glob: string): Stream<T, void> {
     const queue = createQueue<T, void>();
+    const { pathname } = this.location;
 
-    const reg = globToRegExp(`${this.location.pathname}/${glob}`, {
+    const reg = globToRegExp(`${pathname}/${glob}`, {
       globstar: true,
     });
 
@@ -107,13 +125,12 @@ export class FSCache implements Cache {
       ],
     });
 
-    const { location } = this;
     const read = this.read.bind(this);
 
     yield* spawn(function* () {
       for (const file of yield* each(stream(files))) {
         const key = join(
-          dirname(file.path.replace(location.pathname, "")),
+          dirname(file.path.replace(pathname, "")),
           basename(file.name, ".jsonl"),
         );
 
@@ -137,6 +154,6 @@ export class FSCache implements Cache {
   }
 }
 
-export function createPersistentCache(options: InitCacheContextOptions): Cache {
+export function createFSCache(options: InitCacheContextOptions): Cache {
   return new FSCache(options.location);
 }
