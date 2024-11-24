@@ -80,7 +80,7 @@ describe("JSONLCache", () => {
     it("streams multiple items", async () => {
       const items: number[] = [];
       await run(function* () {
-        for (const item of yield* each(yield* cache.read<number>("test"))) {
+        for (const item of yield* each(cache.read<number>("test"))) {
           items.push(item);
           yield* each.next();
         }

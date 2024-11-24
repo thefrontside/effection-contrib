@@ -4,7 +4,7 @@ export interface Cache {
   location: URL;
   write(key: string, data: unknown): Operation<void>;
   append(key: string, data: unknown): Operation<void>;
-  read<T>(key: string): Operation<Stream<T, unknown>>;
+  read<T>(key: string): Stream<T, void>;
   has(key: string): Operation<boolean>;
   find<T>(glob: string): Stream<T, void>;
   clear(): Operation<void>;

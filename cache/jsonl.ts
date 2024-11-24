@@ -93,7 +93,7 @@ export class JSONLCache implements Cache {
    *
    * const cache = yield* useCache();
    *
-   * for (const item of yield* each(yield* cache.read<number>("test"))) {
+   * for (const item of yield* each(cache.read<number>("test"))) {
    *   console.log(item)
    *   yield* each.next();
    * }
@@ -102,16 +102,19 @@ export class JSONLCache implements Cache {
    * @param key string
    * @returns Stream<T>
    */
-  *read<T>(key: string): Operation<Stream<T, void>> {
+  read<T>(key: string): Stream<T, void> {
     const location = new URL(`./${key}.jsonl`, this.location);
-    const file = yield* call(() => Deno.open(location, { read: true }));
 
-    const lines = file
-      .readable
-      .pipeThrough(new TextDecoderStream())
-      .pipeThrough(new JSONLinesParseStream());
+    return resource(function* (provide) {
+      const file = yield* call(() => Deno.open(location, { read: true }));
 
-    return stream(lines as ReadableStream<T>);
+      const lines = file
+        .readable
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(new JSONLinesParseStream());
+
+      yield* provide(yield* stream(lines as ReadableStream<T>));
+    });
   }
 
   /**
@@ -223,8 +226,7 @@ export class JSONLCache implements Cache {
             basename(file.name, ".jsonl"),
           );
 
-          const items = yield* read<T>(key);
-          for (const item of yield* each(items)) {
+          for (const item of yield* each(read<T>(key))) {
             queue.add(item);
             yield* each.next();
           }
