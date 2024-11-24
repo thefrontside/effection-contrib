@@ -16,7 +16,7 @@ import {
   type Stream,
   stream,
 } from "npm:effection@4.0.0-alpha.3";
-import type { Cache, InitCacheContextOptions } from "./types.ts";
+import type { Cache, CacheConstructorOptions } from "./types.ts";
 
 import fs from "node:fs";
 import { promisify } from "node:util";
@@ -30,13 +30,47 @@ function* mkdir(
   return yield* call(() => promisify(fs.mkdir)(path, options));
 }
 
+/**
+ * Cache adapter that stores cache as JSONL files on the filesystem.
+ */
 export class JSONLCache implements Cache {
-  location: URL;
+  constructor(public location: URL) {}
 
-  constructor(location: URL | string) {
-    this.location = toFileUrl(`${location}`.replace(/\/?$/, "/"));
+  /**
+   * Creates a cache store with a location that has a trailing slash.
+   * The trailing slash is important to ensure that the cache content
+   * is written to the cache directory and not the directory above which
+   * can be very annoying. The location has to be absolute.
+   *
+   * ```ts
+   * const cache = JSONLCache.from({ location: 'file:///Users/foo/.cache/' })
+   * ```
+   *
+   * @param options CacheConstructorOptions
+   * @returns
+   */
+  static from(options: CacheConstructorOptions) {
+    return new JSONLCache(
+      toFileUrl(`${options.location}`.replace(/\/?$/, "/")),
+    );
   }
 
+  /**
+   * Returns true when key is present
+   *
+   * ```ts
+   * import { useCache } from "jsr:@effection-contrib/cache";
+   *
+   * const cache = yield* useCache();
+   *
+   * if (yield* cache.has("test")) {
+   *  console.log("cache exists");
+   * }
+   * ```
+   *
+   * @param key string
+   * @returns boolean
+   */
   *has(key: string) {
     const location = new URL(`./${key}.jsonl`, this.location);
 
@@ -49,6 +83,24 @@ export class JSONLCache implements Cache {
     });
   }
 
+  /**
+   * Returns content of a file as a stream
+   *
+   * ```ts
+   * import { each } from "npm:effection@4.0.0-alpha.3";
+   * import { useCache } from "jsr:@effection-contrib/cache";
+   *
+   * const cache = yield* useCache();
+   *
+   * for (const item of yield* each(yield* cache.read<number>("test"))) {
+   *   console.log(item)
+   *   yield* each.next();
+   * }
+   * ```
+   *
+   * @param key string
+   * @returns Stream<T>
+   */
   *read<T>(key: string) {
     const location = new URL(`./${key}.jsonl`, this.location);
     const file = yield* call(() => Deno.open(location, { read: true }));
@@ -61,6 +113,18 @@ export class JSONLCache implements Cache {
     return stream(lines as ReadableStream<T>);
   }
 
+  /**
+   * Write data to a file, creates the file and necessary directory structure as it goes along.
+   *
+   * ```ts
+   * import { useCache } from "jsr:@effection-contrib/cache";
+   *
+   * const cache = yield* useCache();
+   * yield* cache.write("hello", "world");
+   * ```
+   * @param key string
+   * @param data unknown
+   */
   *write(key: string, data: unknown) {
     const location = new URL(`./${key}.jsonl`, this.location);
 
@@ -82,6 +146,19 @@ export class JSONLCache implements Cache {
     }
   }
 
+  /**
+   * Add data to an existing file.
+   *
+   * ```ts
+   * import { useCache } from "jsr:@effection-contrib/cache";
+   *
+   * const cache = yield* useCache();
+   * yield* cache.write("hello", "world");
+   * yield* cache.append("hello", "from bob");
+   * ```
+   * @param key string
+   * @param data
+   */
   *append(key: string, data: unknown) {
     const location = new URL(`./${key}.jsonl`, this.location);
 
@@ -100,6 +177,24 @@ export class JSONLCache implements Cache {
     }
   }
 
+  /**
+   * Returns a stream of content from all files matching a glob
+   *
+   * ```ts
+   * import { each } from "npm:effection@4.0.0-alpha.3";
+   * import { useCache } from "jsr:@effection-contrib/cache";
+   *
+   * const cache = yield* useCache();
+   *
+   * for (const item of yield* each(cache.find<number>("subdir/*"))) {
+   *   console.log(item);
+   *    yield* each.next();
+   * }
+   * ```
+   *
+   * @param glob string
+   * @returns Stream<T, void>
+   */
   *find<T>(glob: string): Stream<T, void> {
     const queue = createQueue<T, void>();
     const { pathname } = this.location;
@@ -143,8 +238,4 @@ export class JSONLCache implements Cache {
   *clear() {
     yield* call(() => emptyDir(this.location));
   }
-}
-
-export function createJSONLCache(options: InitCacheContextOptions): Cache {
-  return new JSONLCache(options.location);
 }

@@ -1,9 +1,11 @@
 import { createContext, type Operation } from "npm:effection@4.0.0-alpha.3";
-import { createJSONLCache } from "./jsonl.ts";
 import { join } from "jsr:@std/path@1.0.8";
-import type { Cache } from './types.ts';
+import type { Cache } from "./types.ts";
+import { JSONLCache } from "./mod.ts";
 
-const DEFAULT_CACHE = createJSONLCache({ location: join(import.meta.dirname ?? Deno.cwd(), '.cache') });
+const DEFAULT_CACHE = JSONLCache.from({
+  location: join(import.meta.dirname ?? Deno.cwd(), ".cache"),
+});
 
 export const CacheContext = createContext<Cache>("cache", DEFAULT_CACHE);
 

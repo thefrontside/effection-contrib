@@ -10,6 +10,6 @@ export interface Cache {
   clear(): Operation<void>;
 }
 
-export interface InitCacheContextOptions {
+export interface CacheConstructorOptions {
   location: URL | string;
 }

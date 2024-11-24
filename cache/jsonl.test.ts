@@ -1,6 +1,6 @@
 import { each, run } from "npm:effection@4.0.0-alpha.3";
 import { beforeEach, describe, it } from "jsr:@std/testing@1.0.5/bdd";
-import { createJSONLCache } from "./jsonl.ts";
+import { JSONLCache } from "./jsonl.ts";
 import type { Cache } from "./types.ts";
 import { expect } from "jsr:@std/expect@1.0.8";
 import { dirname, join } from "jsr:@std/path@1.0.8";
@@ -34,7 +34,12 @@ describe("JSONLCache", () => {
 
   beforeEach(async () => {
     tmpDir = await Deno.makeTempDir();
-    cache = createJSONLCache({ location: tmpDir });
+    cache = JSONLCache.from({ location: tmpDir });
+  });
+
+  it("has from constructor that ensures trailing slash", () => {
+    const cache = JSONLCache.from({ location: "/foo" });
+    expect(`${cache.location}`).toEqual("file:///foo/");
   });
 
   it("writes to a file", async () => {
@@ -90,19 +95,19 @@ describe("JSONLCache", () => {
     });
     it("returns true when file exists", async () => {
       let result: boolean | undefined = undefined;
-      await run(function*() {
-        result = yield* cache.has("1")
+      await run(function* () {
+        result = yield* cache.has("1");
       });
       expect(result).toBe(true);
     });
     it("returns false when file does not exists", async () => {
       let result: boolean | undefined = undefined;
-      await run(function*() {
-        result = yield* cache.has("2")
+      await run(function* () {
+        result = yield* cache.has("2");
       });
       expect(result).toBe(false);
     });
-  })
+  });
 
   describe("finds cached files using glob", () => {
     beforeEach(async () => {
