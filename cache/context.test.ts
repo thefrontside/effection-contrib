@@ -6,7 +6,7 @@ import { expect } from "expect/expect";
 describe("CacheContext", () => {
   it("allows accessing context without initializing", async () => {
     let cache;
-    await run(function*() {
+    await run(function* () {
       cache = yield* useCache();
     });
     expect(cache).toBeDefined();
