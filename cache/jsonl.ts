@@ -49,7 +49,7 @@ export class JSONLCache implements Cache {
    * @param options CacheConstructorOptions
    * @returns
    */
-  static from(options: CacheConstructorOptions) {
+  static from(options: CacheConstructorOptions): JSONLCache {
     return new JSONLCache(
       toFileUrl(`${options.location}`.replace(/\/?$/, "/")),
     );
@@ -71,7 +71,7 @@ export class JSONLCache implements Cache {
    * @param key string
    * @returns boolean
    */
-  *has(key: string) {
+  *has(key: string): Operation<boolean> {
     const location = new URL(`./${key}.jsonl`, this.location);
 
     return yield* call(async () => {
@@ -101,7 +101,7 @@ export class JSONLCache implements Cache {
    * @param key string
    * @returns Stream<T>
    */
-  *read<T>(key: string) {
+  *read<T>(key: string): Operation<Stream<T, void>> {
     const location = new URL(`./${key}.jsonl`, this.location);
     const file = yield* call(() => Deno.open(location, { read: true }));
 
@@ -125,7 +125,7 @@ export class JSONLCache implements Cache {
    * @param key string
    * @param data unknown
    */
-  *write(key: string, data: unknown) {
+  *write(key: string, data: unknown): Operation<void> {
     const location = new URL(`./${key}.jsonl`, this.location);
 
     yield* mkdir(dirname(location.pathname), { recursive: true });
@@ -159,7 +159,7 @@ export class JSONLCache implements Cache {
    * @param key string
    * @param data
    */
-  *append(key: string, data: unknown) {
+  *append(key: string, data: unknown): Operation<void> {
     const location = new URL(`./${key}.jsonl`, this.location);
 
     const file = yield* call(() =>
@@ -235,7 +235,7 @@ export class JSONLCache implements Cache {
     return queue;
   }
 
-  *clear() {
+  *clear(): Operation<void> {
     yield* call(() => emptyDir(this.location));
   }
 }
