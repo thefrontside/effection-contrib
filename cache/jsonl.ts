@@ -1,14 +1,20 @@
 import { JSONLinesParseStream } from "https://deno.land/x/jsonlines@v1.2.2/mod.ts";
 import { emptyDir, exists, walk } from "jsr:@std/fs@1.0.4";
-import { basename, dirname, globToRegExp, join, toFileUrl } from "jsr:@std/path@1.0.6";
+import {
+  basename,
+  dirname,
+  globToRegExp,
+  join,
+  toFileUrl,
+} from "jsr:@std/path@1.0.6";
 import {
   call,
   createQueue,
   each,
   type Operation,
   spawn,
-  stream,
   type Stream,
+  stream,
 } from "npm:effection@4.0.0-alpha.3";
 import type { Cache, InitCacheContextOptions } from "./types.ts";
 
@@ -24,26 +30,11 @@ function* mkdir(
   return yield* call(() => promisify(fs.mkdir)(path, options));
 }
 
-function* writeFile(
-  file: fs.PathOrFileDescriptor,
-  data: string | NodeJS.ArrayBufferView,
-  options?: fs.WriteFileOptions,
-): Operation<void> {
-  return yield* call(() => promisify(fs.writeFile)(file, data, options));
-}
-
-function* stat(
-  path: fs.PathLike,
-  options?: fs.StatOptions,
-): Operation<fs.Stats | fs.BigIntStats> {
-  return yield* call(() => promisify(fs.stat)(path, options));
-}
-
-export class FSCache implements Cache {
+export class JSONLCache implements Cache {
   location: URL;
 
   constructor(location: URL | string) {
-    this.location = toFileUrl(`${location}`.replace(/\/?$/, '/'));
+    this.location = toFileUrl(`${location}`.replace(/\/?$/, "/"));
   }
 
   *has(key: string) {
@@ -154,6 +145,6 @@ export class FSCache implements Cache {
   }
 }
 
-export function createFSCache(options: InitCacheContextOptions): Cache {
-  return new FSCache(options.location);
+export function createJSONLCache(options: InitCacheContextOptions): Cache {
+  return new JSONLCache(options.location);
 }
