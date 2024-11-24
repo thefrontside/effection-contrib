@@ -12,6 +12,7 @@ import {
   createQueue,
   each,
   type Operation,
+  resource,
   spawn,
   type Stream,
   stream,
@@ -195,8 +196,7 @@ export class JSONLCache implements Cache {
    * @param glob string
    * @returns Stream<T, void>
    */
-  *find<T>(glob: string): Stream<T, void> {
-    const queue = createQueue<T, void>();
+  find<T>(glob: string): Stream<T, void> {
     const { pathname } = this.location;
 
     const reg = globToRegExp(`${pathname}/${glob}`, {
@@ -213,26 +213,30 @@ export class JSONLCache implements Cache {
 
     const read = this.read.bind(this);
 
-    yield* spawn(function* () {
-      for (const file of yield* each(stream(files))) {
-        const key = join(
-          dirname(file.path.replace(pathname, "")),
-          basename(file.name, ".jsonl"),
-        );
+    return resource(function* (provide) {
+      const queue = createQueue<T, void>();
 
-        const items = yield* read<T>(key);
-        for (const item of yield* each(items)) {
-          queue.add(item);
+      yield* spawn(function* () {
+        for (const file of yield* each(stream(files))) {
+          const key = join(
+            dirname(file.path.replace(pathname, "")),
+            basename(file.name, ".jsonl"),
+          );
+
+          const items = yield* read<T>(key);
+          for (const item of yield* each(items)) {
+            queue.add(item);
+            yield* each.next();
+          }
+
           yield* each.next();
         }
 
-        yield* each.next();
-      }
+        queue.close();
+      });
 
-      queue.close();
+      yield* provide(queue);
     });
-
-    return queue;
   }
 
   *clear(): Operation<void> {
