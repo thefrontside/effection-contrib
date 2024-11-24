@@ -10,7 +10,7 @@ import { dirname, join } from "jsr:@std/path@1.0.8";
 import { mkdir } from "node:fs";
 import { promisify } from "node:util";
 
-describe("FSCache", () => {
+describe("JSONLCache", () => {
   let cache: Cache;
   let tmpDir: string;
 
@@ -83,6 +83,26 @@ describe("FSCache", () => {
       expect(items).toEqual([1, 2, 3]);
     });
   });
+
+  describe("checking presence of cache", () => {
+    beforeEach(async () => {
+      await writeTmpFile("1.jsonl", "1\n");
+    });
+    it("returns true when file exists", async () => {
+      let result: boolean | undefined = undefined;
+      await run(function*() {
+        result = yield* cache.has("1")
+      });
+      expect(result).toBe(true);
+    });
+    it("returns false when file does not exists", async () => {
+      let result: boolean | undefined = undefined;
+      await run(function*() {
+        result = yield* cache.has("2")
+      });
+      expect(result).toBe(false);
+    });
+  })
 
   describe("finds cached files using glob", () => {
     beforeEach(async () => {
