@@ -31,9 +31,6 @@ function* mkdir(
   return yield* call(() => promisify(fs.mkdir)(path, options));
 }
 
-/**
- * Cache adapter that stores cache as JSONL files on the filesystem.
- */
 export class JSONLCache implements Cache {
   constructor(public location: URL) {}
 
@@ -42,7 +39,6 @@ export class JSONLCache implements Cache {
    * The trailing slash is important to ensure that the cache content
    * is written to the cache directory and not the directory above which
    * can be very annoying. The location has to be absolute.
-   *
    * ```ts
    * const cache = JSONLCache.from({ location: 'file:///Users/foo/.cache/' })
    * ```
@@ -58,7 +54,6 @@ export class JSONLCache implements Cache {
 
   /**
    * Returns true when key is present
-   *
    * ```ts
    * import { useCache } from "jsr:@effection-contrib/cache";
    *
