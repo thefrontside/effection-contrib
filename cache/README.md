@@ -3,6 +3,8 @@
 Cache module provides an adapter interface for caching and reusing results of
 computations. It includes a JSONL adapter for storing cache on the file system.
 
+---
+
 ## Getting Started
 
 You can use the default cache client which will write cache to

@@ -8,13 +8,15 @@ import rehypeInferDescriptionMeta from "npm:rehype-infer-description-meta@2.0.0"
 import rehypeStringify from "npm:rehype-stringify@10.0.1";
 import remarkParse from "npm:remark-parse@11.0.0";
 import remarkRehype from "npm:remark-rehype@11.1.1";
+import { trimAfterHR } from "../lib/trim-after-hr.ts";
 
-export function* useRemarkParse(markdown: string): Operation<VFile> {
+export function* useDescriptionParse(markdown: string): Operation<VFile> {
   return yield* call(() =>
     unified()
       .use(remarkParse)
       .use(remarkRehype)
       .use(rehypeStringify)
+      .use(trimAfterHR)
       .use(rehypeInferDescriptionMeta, {
         inferDescriptionHast: true,
         truncateSize: 400,
