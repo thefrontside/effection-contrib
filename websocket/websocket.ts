@@ -1,5 +1,5 @@
-import { createSignal, once, race, resource, spawn } from "effection";
-import type { Operation, Stream } from "effection";
+import { createSignal, once, race, resource, spawn } from "npm:effection@3.0.3";
+import type { Operation, Stream } from "npm:effection@3.0.3";
 import { withResolvers } from "./with-resolvers.ts";
 
 /**

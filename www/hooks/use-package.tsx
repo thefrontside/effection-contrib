@@ -25,11 +25,12 @@ export type RenderableDocNode = DocNode & {
   MDXDoc?: () => JSXElement;
 };
 
-const DenoJson = z.object({
+export const DenoJson = z.object({
   name: z.string(),
   version: z.optional(z.string()),
   exports: z.union([z.record(z.string()), z.string()]),
   private: z.union([z.undefined(), z.literal(true)]),
+  license: z.string(),
 });
 
 export const DEFAULT_MODULE_KEY = ".";

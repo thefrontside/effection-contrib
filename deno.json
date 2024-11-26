@@ -8,7 +8,8 @@
     "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
     "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts",
     "bdd": "jsr:@std/testing/bdd",
-    "expect": "jsr:@std/expect"
+    "expect": "jsr:@std/expect",
+    "effection": "npm:effection@3.0.3"
   },
   "compilerOptions": {
     "lib": [
