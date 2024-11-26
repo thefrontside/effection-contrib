@@ -37,7 +37,18 @@ await main(function* () {
     }
   }
 
-  let outputValue = `matrix=${JSON.stringify({ include })}`;
+  let exists = include.length > 0;
+
+  if (!exists) {
+    include.push({ workspace: "nothing" });
+  }
+
+  let outputValue = [
+    `exists=${exists}`,
+    `matrix=${JSON.stringify({ include })}`,
+  ].join("\n");
+
+  console.log(outputValue);
 
   if (Deno.env.has("GITHUB_OUTPUT")) {
     const githubOutput = Deno.env.get("GITHUB_OUTPUT") as string;
@@ -46,8 +57,5 @@ await main(function* () {
         append: true,
       })
     );
-  } else {
-    // for local dev
-    console.log(outputValue);
   }
 });
