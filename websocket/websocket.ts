@@ -163,4 +163,7 @@ export function useWebSocket<T>(
   });
 }
 
+/**
+ * @ignore
+ */
 export type WebSocketData = Parameters<WebSocket["send"]>[0];
