@@ -13,7 +13,6 @@ export function trimAfterHR() {
         node.type === "element" && node.tagName === "hr" &&
         parent.type === "root"
       ) {
-        // console.log({node, index, parent})
         parent.children = parent.children.slice(0, index);
         return EXIT;
       }
