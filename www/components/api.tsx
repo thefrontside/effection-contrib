@@ -2,6 +2,7 @@ import { call, type Operation } from "effection";
 import type { JSXElement } from "revolution";
 import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
 import type {
+  ClassDef,
   InterfaceDef,
   ParamDef,
   TsTypeDef,
@@ -32,14 +33,12 @@ export function* API({ pkg }: DescriptionProps): Operation<JSXElement> {
       const { MDXDoc = () => <></> } = node;
 
       elements.push(
-        (
-          <section id={node.id}>
-            {yield* Type({ node })}
-            <div class="pl-2 -mt-5">
-              <MDXDoc />
-            </div>
-          </section>
-        ),
+        <section id={node.id}>
+          {yield* Type({ node })}
+          <div class="pl-2 -mt-5">
+            <MDXDoc />
+          </div>
+        </section>,
       );
     }
   }
@@ -57,8 +56,13 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
         <header>
           <h3 class="inline-block" style="text-wrap: nowrap;">
             <span class="language-ts code-highlight">
-              <Keyword>{node.kind}</Keyword>{" "}
-              <span class="token function">{node.name}</span>
+              {node.functionDef.isAsync
+                ? <Punctuation>{"async "}</Punctuation>
+                : <></>}
+              <Keyword>{node.kind}</Keyword>
+              {node.functionDef.isGenerator
+                ? <Punctuation>*</Punctuation>
+                : <></>} <span class="token function">{node.name}</span>
               <Punctuation>(</Punctuation>
               <FunctionParams params={node.functionDef.params} />
               <Punctuation>)</Punctuation>: {node.functionDef.returnType
@@ -66,6 +70,42 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
                 : <></>}
             </span>
           </h3>
+        </header>
+      );
+    case "class":
+      return (
+        <header class="mb-10">
+          {/** TODO(taras): figure out why text-nowrap is missing **/}
+          <h3 class="inline-block mb-0" style="text-wrap: nowrap;">
+            <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
+            {node.classDef.extends
+              ? (
+                <>
+                  <Keyword>{" extends "}</Keyword>
+                  <ClassName>{node.classDef.extends}</ClassName>
+                </>
+              )
+              : <></>}
+            {node.classDef.implements
+              ? (
+                <>
+                  <Keyword>{" implements "}</Keyword>
+                  <>
+                    {node.classDef.implements
+                      .flatMap((
+                        typeDef,
+                      ) => [<TypeDef typeDef={typeDef} />, ", "])
+                      .slice(0, -1)}
+                  </>
+                </>
+              )
+              : <></>}
+            <Punctuation classes="text-lg" style="text-wrap: nowrap;">
+              {" {"}
+            </Punctuation>
+          </h3>
+          {yield* TSClassDef({ classDef: node.classDef })}
+          <Punctuation classes="text-lg">{"}"}</Punctuation>
         </header>
       );
     case "interface":
@@ -86,9 +126,11 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
                 <>
                   <Keyword>{" extends "}</Keyword>
                   <>
-                    {node.interfaceDef.extends.flatMap(
-                      (typeDef) => [<TypeDef typeDef={typeDef} />, ", "],
-                    ).slice(0, -1)}
+                    {node.interfaceDef.extends
+                      .flatMap((
+                        typeDef,
+                      ) => [<TypeDef typeDef={typeDef} />, ", "])
+                      .slice(0, -1)}
                   </>
                 </>
               )
@@ -131,9 +173,13 @@ function* Type({ node }: TypeProps): Operation<JSXElement> {
   }
 }
 
-function TSVariableDef(
-  { variableDef, name }: { variableDef: VariableDef; name: string },
-) {
+function TSVariableDef({
+  variableDef,
+  name,
+}: {
+  variableDef: VariableDef;
+  name: string;
+}) {
   return (
     <>
       <Keyword>{variableDef.kind}</Keyword> {name}
@@ -143,9 +189,59 @@ function TSVariableDef(
   );
 }
 
-function* TSInterfaceDef(
-  { interfaceDef }: { interfaceDef: InterfaceDef },
-): Operation<JSXElement> {
+function* TSClassDef({
+  classDef,
+}: { classDef: ClassDef }) {
+  const elements: JSXElement[] = [];
+
+  for (const property of classDef.properties) {
+    const jsDoc = property.jsDoc?.doc
+      ? yield* useMarkdown(property.jsDoc?.doc)
+      : undefined;
+    elements.push(
+      <li class={`text-base ${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
+        {jsDoc ? <div class="-mb-5">{jsDoc}</div> : <></>}
+        {property.name}
+        <Optional optional={property.optional} />
+        <Operator>{": "}</Operator>
+        {property.tsType ? <TypeDef typeDef={property.tsType} /> : <></>}
+        <Punctuation>{";"}</Punctuation>
+      </li>,
+    );
+  }
+
+  for (const method of classDef.methods) {
+    const jsDoc = yield* call(function* (): Operation<JSXElement | undefined> {
+      if (method.jsDoc?.doc) {
+        const mod = yield* useMDX(method.jsDoc?.doc);
+        return mod.default();
+      }
+    });
+    elements.push(
+      <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
+        {jsDoc ? <div>{jsDoc}</div> : <></>}
+        <span class="font-bold">{method.name}</span>
+        <Optional optional={method.optional} />
+        <Punctuation>(</Punctuation>
+        <FunctionParams params={method.functionDef.params} />
+        <Punctuation>)</Punctuation>
+        <Operator>{": "}</Operator>
+        {method.functionDef.returnType
+          ? <TypeDef typeDef={method.functionDef.returnType} />
+          : <></>}
+        <Punctuation>{";"}</Punctuation>
+      </li>,
+    );
+  }
+
+  return <ul class="my-0 list-none pl-1">{elements}</ul>;
+}
+
+function* TSInterfaceDef({
+  interfaceDef,
+}: {
+  interfaceDef: InterfaceDef;
+}): Operation<JSXElement> {
   const elements: JSXElement[] = [];
   for (const property of interfaceDef.properties) {
     const jsDoc = property.jsDoc?.doc
@@ -153,13 +249,7 @@ function* TSInterfaceDef(
       : undefined;
     elements.push(
       <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
-        {jsDoc
-          ? (
-            <div class="-mb-5">
-              {jsDoc}
-            </div>
-          )
-          : <></>}
+        {jsDoc ? <div class="-mb-5">{jsDoc}</div> : <></>}
         {property.name}
         <Optional optional={property.optional} />
         <Operator>{": "}</Operator>
@@ -178,13 +268,7 @@ function* TSInterfaceDef(
     });
     elements.push(
       <li class={`${jsDoc ? "my-0 border-l-2 first:-mt-5" : "my-1"}`}>
-        {jsDoc
-          ? (
-            <div class="-mb-5">
-              {jsDoc}
-            </div>
-          )
-          : <></>}
+        {jsDoc ? <div class="-mb-5">{jsDoc}</div> : <></>}
         {method.name}
         <Optional optional={method.optional} />
         <Punctuation>(</Punctuation>
@@ -196,29 +280,21 @@ function* TSInterfaceDef(
       </li>,
     );
   }
-  return (
-    <ul class="my-0 list-none pl-1">
-      {elements}
-    </ul>
-  );
+
+  return <ul class="my-0 list-none pl-1">{elements}</ul>;
 }
 
 function FunctionParams({ params }: { params: ParamDef[] }) {
   return (
     <>
-      {params.flatMap((param) => [
-        <TSParam
-          param={param}
-        />,
-        ", ",
-      ]).slice(0, -1)}
+      {params
+        .flatMap((param) => [<TSParam param={param} />, ", "])
+        .slice(0, -1)}
     </>
   );
 }
 
-function TSParam({ param }: {
-  param: ParamDef;
-}) {
+function TSParam({ param }: { param: ParamDef }) {
   if (param.kind === "identifier") {
     return (
       <>
@@ -232,9 +308,7 @@ function TSParam({ param }: {
   return <></>;
 }
 
-function TypeDef({ typeDef }: {
-  typeDef: TsTypeDef;
-}) {
+function TypeDef({ typeDef }: { typeDef: TsTypeDef }) {
   switch (typeDef.kind) {
     case "literal":
       switch (typeDef.literal.kind) {
@@ -301,16 +375,14 @@ function TypeDefUnion({ union }: { union: TsTypeDef[] }) {
       {union.flatMap((typeDef, index) => (
         <>
           <TypeDef typeDef={typeDef} />
-          {(index + 1) < union.length ? <Operator>{" | "}</Operator> : <></>}
+          {index + 1 < union.length ? <Operator>{" | "}</Operator> : <></>}
         </>
       ))}
     </>
   );
 }
 
-function TypeRef({ typeRef }: {
-  typeRef: TsTypeRefDef;
-}) {
+function TypeRef({ typeRef }: { typeRef: TsTypeRefDef }) {
   return (
     <>
       {typeRef.typeName}
@@ -319,9 +391,9 @@ function TypeRef({ typeRef }: {
           <>
             <Operator>{"<"}</Operator>
             <>
-              {typeRef.typeParams.flatMap((
-                tp,
-              ) => [<TypeDef typeDef={tp} />, ", "]).slice(0, -1)}
+              {typeRef.typeParams
+                .flatMap((tp) => [<TypeDef typeDef={tp} />, ", "])
+                .slice(0, -1)}
             </>
             <Operator>{">"}</Operator>
           </>
@@ -331,24 +403,28 @@ function TypeRef({ typeRef }: {
   );
 }
 
-function InterfaceTypeParams(
-  { typeParams }: { typeParams: TsTypeParamDef[] },
-): JSXElement {
+function InterfaceTypeParams({
+  typeParams,
+}: {
+  typeParams: TsTypeParamDef[];
+}): JSXElement {
   return (
     <>
       <Operator>{"<"}</Operator>
       <>
-        {typeParams.flatMap((param) => {
-          return [
-            <>
-              {param.name}
-              {param.constraint
-                ? <TypeDef typeDef={param.constraint} />
-                : <></>}
-            </>,
-            <>,</>,
-          ];
-        }).slice(0, -1)}
+        {typeParams
+          .flatMap((param) => {
+            return [
+              <>
+                {param.name}
+                {param.constraint
+                  ? <TypeDef typeDef={param.constraint} />
+                  : <></>}
+              </>,
+              <>,</>,
+            ];
+          })
+          .slice(0, -1)}
       </>
       <Operator>{">"}</Operator>
     </>
