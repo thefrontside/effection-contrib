@@ -1,6 +1,7 @@
 # JSONL Streaming Store
 
-JSONL Streaming Store provides an easy way to store documents in JSONL files.
+JSONL Streaming Store provides an easy way to store documents in JSONL files. This is useful when you need cache responses from HTTP requests for later processing. This API focuses on providing streaming APIs for working
+with the contents of the store with a glob selector syntax for choosing which files to read.
 
 ---
 
@@ -73,7 +74,7 @@ import { useStore } from "jsr:@effection-contrib/jsonl-store";
 await run(function* () {
   const store = yield* useStore();
 
-  for (const item of yield* each(store.read<number>("greeting"))) {
+  for (const item of yield* each(store.read<string>("greeting"))) {
     console.log(item);
     yield* each.next();
   }

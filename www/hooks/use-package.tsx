@@ -3,6 +3,7 @@ import { join, resolve } from "jsr:@std/path@1.0.6";
 import type { VFile } from "npm:vfile@6.0.3";
 import { z } from "npm:zod@3.23.8";
 import type { JSXElement } from "revolution";
+import { logPrettyZodError } from "npm:@nortex/pretty-zod-error@2.0.0";
 
 import { PrivatePackageError } from "../errors.ts";
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
@@ -38,16 +39,29 @@ export const DEFAULT_MODULE_KEY = ".";
 export function* usePackage(workspace: string): Operation<Package> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
+  const denoJsonPath = `${workspace}/deno.json`;
+
   const config: { private?: boolean } = yield* call(
     async () =>
-      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
+      JSON.parse(await Deno.readTextFile(denoJsonPath)),
   );
 
   if (config.private === true) {
     throw new PrivatePackageError(workspace);
   }
 
-  const denoJson = DenoJson.parse(config);
+  let denoJson: z.infer<typeof DenoJson> | undefined;
+
+  try {
+    denoJson = DenoJson.parse(config)
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      logPrettyZodError(e);
+      throw new Error(`${denoJsonPath} failed validation`)
+    } else {
+      throw e;
+    }
+  }
 
   const readme = yield* call(async () => {
     try {
