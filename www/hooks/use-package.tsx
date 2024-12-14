@@ -9,13 +9,80 @@ import { PrivatePackageError } from "../errors.ts";
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
 import { useDescriptionParse } from "./use-description-parse.tsx";
+import { REPOSITORY_DEFAULT_BRANCH_URL } from "../config.ts";
 
 export interface Package {
+  /**
+   * Location of the package on the file system
+   */
   path: string;
+  /**
+   * Name of the directory on the file system
+   */
   workspace: string;
+  /**
+   * Name of the scope (without @) - should be effection-contrib
+   */
+  scope: string;
+  /**
+   * Name of the package without the scope 
+   */
+  name: string;
+  /**
+   * Full package name from deno.json#name
+   */
   packageName: string;
+  /**
+   * Package version in the repository
+   */
+  version: string;
+  /**
+   * Source code URL 
+   */
+  source: URL;
+  /**
+   * URL of the package on JSR
+   */
+  jsr: URL;
+  /**
+   * URL of the package on JSR
+   */
+  jsrBadge: URL;
+  /**
+   * URL of package on npm
+   */
+  npm: URL;
+  /**
+   * URL of badge for version published on npm
+   */
+  npmVersionBadge: URL;
+  /**
+   * Contents of the README.md file
+   */
   readme: string;
+  /**
+   * Normalized exports from deno.json file
+   */
   exports: Record<string, string>;
+  /**
+   * Bundle size badge from bundlephobia
+   */
+  bundleSizeBadge: URL;
+  /**
+   * Bundlephobia URL
+   */
+  bundlephobia: URL;
+  /**
+   * Dependency Count Badge
+   */
+  dependencyCountBadge: URL;
+  /**
+   * Tree Shaking Support Badge URL
+   */
+  treeShakingSupportBadge: URL;
+  /**
+   * Generated docs
+   */
   docs: Record<string, Array<RenderableDocNode>>;
   MDXContent: () => JSX.Element;
   MDXDescription: () => JSX.Element;
@@ -28,7 +95,7 @@ export type RenderableDocNode = DocNode & {
 
 export const DenoJson = z.object({
   name: z.string(),
-  version: z.optional(z.string()),
+  version: z.string(),
   exports: z.union([z.record(z.string()), z.string()]),
   private: z.union([z.undefined(), z.literal(true)]),
   license: z.string(),
@@ -82,6 +149,11 @@ export function* usePackage(workspace: string): Operation<Package> {
     }
     : denoJson.exports;
 
+  const [, scope, name] = denoJson.name.match(/@(.*)\/(.*)/) ?? [];
+
+  if (!scope) throw new Error(`Expected a scope but got ${scope}`);
+  if (!name) throw new Error(`Expected a package name but got ${name}`);
+  
   const entrypoints: Record<string, URL> = {};
   for (const key of Object.keys(exports)) {
     entrypoints[key] = new URL(join(workspacePath, exports[key]), "file://");
@@ -115,11 +187,23 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   return {
     workspace: workspace.replace("./", ""),
+    jsr: new URL(`./${denoJson.name}`, 'https://jsr.io/'),
+    jsrBadge: new URL(`./${denoJson.name}`, 'https://jsr.io/badges/'),
+    npm: new URL(`./${denoJson.name}`, 'https://www.npmjs.com/package/'),
+    bundleSizeBadge: new URL(`./${denoJson.name}/${denoJson.version}`, 'https://img.shields.io/bundlephobia/minzip/'),
+    npmVersionBadge: new URL(`./${denoJson.name}`, 'https://img.shields.io/npm/v/'),
+    bundlephobia: new URL(`./${denoJson.name}/${denoJson.version}`, 'https://bundlephobia.com/package/'),
+    dependencyCountBadge: new URL(`./${denoJson.name}`, 'https://badgen.net/bundlephobia/dependency-count/'),
+    treeShakingSupportBadge: new URL(`./${denoJson.name}`, 'https://badgen.net/bundlephobia/tree-shaking/'),
     path: workspacePath,
     packageName: denoJson.name,
+    scope,
+    source: new URL(workspace, REPOSITORY_DEFAULT_BRANCH_URL),
+    name,
     exports,
     readme,
     docs,
+    version: denoJson.version,
     MDXContent: () => content,
     MDXDescription: () => <>{file.data?.meta?.description}</>,
   };
