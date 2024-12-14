@@ -1,5 +1,5 @@
 import { main, suspend } from "effection";
-import { createRevolution } from "revolution";
+import { createRevolution, ServerInfo } from "revolution";
 import { initDenoDeploy } from "../deno-deploy/mod.ts";
 
 import { config } from "effection-www/tailwind.config.ts";
@@ -32,8 +32,13 @@ if (import.meta.main) {
     });
 
     let server = yield* revolution.start();
-    console.log(`www -> http://${server.hostname}:${server.port}`);
+    console.log(`www -> ${urlFromServer(server)}`);
 
     yield* suspend();
   });
+}
+
+
+function urlFromServer(server: ServerInfo) {
+  return new URL("/", `http://${server.hostname === "0.0.0.0" ? "localhost" : server.hostname}:${server.port}`);
 }
