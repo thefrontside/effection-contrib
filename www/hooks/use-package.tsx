@@ -7,7 +7,7 @@ import type { JSXElement } from "revolution";
 import { PrivatePackageError } from "../errors.ts";
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
-import { useRemarkParse } from "./use-remark-parse.tsx";
+import { useDescriptionParse } from "./use-description-parse.tsx";
 
 export interface Package {
   path: string;
@@ -61,7 +61,7 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   const content = mod.default({});
 
-  let file: VFile = yield* useRemarkParse(readme);
+  let file: VFile = yield* useDescriptionParse(readme);
 
   const exports = typeof denoJson.exports === "string"
     ? {
