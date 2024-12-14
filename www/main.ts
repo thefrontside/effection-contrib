@@ -38,7 +38,11 @@ if (import.meta.main) {
   });
 }
 
-
 function urlFromServer(server: ServerInfo) {
-  return new URL("/", `http://${server.hostname === "0.0.0.0" ? "localhost" : server.hostname}:${server.port}`);
+  return new URL(
+    "/",
+    `http://${
+      server.hostname === "0.0.0.0" ? "localhost" : server.hostname
+    }:${server.port}`,
+  );
 }

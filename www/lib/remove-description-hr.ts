@@ -13,14 +13,17 @@ export function removeDescriptionHR() {
       ) {
         const beforeHR = parent.children
           .slice(0, index)
-          .filter(node => !(node.type === "text" && node.value === "\n"));
+          .filter((node) => !(node.type === "text" && node.value === "\n"));
 
         // assume this hr is for a description if there are only two elements and
         // second element is a paragraph.
-        if (beforeHR.length === 2 && beforeHR[1].type === "element" && beforeHR[1].tagName === "p") {
-          parent.children = parent.children.filter(child => child !== node);
+        if (
+          beforeHR.length === 2 && beforeHR[1].type === "element" &&
+          beforeHR[1].tagName === "p"
+        ) {
+          parent.children = parent.children.filter((child) => child !== node);
         }
-        
+
         return EXIT;
       }
     });

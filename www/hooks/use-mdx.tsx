@@ -17,7 +17,9 @@ export function* useMDX(markdown: string): Operation<MDXModule> {
       jsxDEV: jsx,
       Fragment,
       remarkPlugins: [remarkGfm],
-      rehypePlugins: [[removeDescriptionHR], [rehypePrismPlus, { showLineNumbers: true }]],
+      rehypePlugins: [[removeDescriptionHR], [rehypePrismPlus, {
+        showLineNumbers: true,
+      }]],
     })
   );
 }

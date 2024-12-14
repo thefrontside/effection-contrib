@@ -13,16 +13,16 @@ the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 constructor.
 
 ```ts
-import { main, each } from "effection";
+import { each, main } from "effection";
 import { useWebSocket } from "@effection-contrib/websocket";
 
-await main(function*() {
+await main(function* () {
   let socket = yield* useWebSocket("ws://websocket.example.org");
 
   socket.send("Hello World");
 
   for (let message of yield* each(socket)) {
-    console.log('Message from server', message);
+    console.log("Message from server", message);
     yield* each.next();
   }
 });
@@ -43,11 +43,13 @@ You can also instantiate a websocket separately and pass it along to
 ```ts
 import { createWebSocket } from "my-websocket-client";
 
-await main(function*() {
-  let socket = yield* useWebSocket(() => createWebSocket("ws://websocket.example.org"));
+await main(function* () {
+  let socket = yield* useWebSocket(() =>
+    createWebSocket("ws://websocket.example.org")
+  );
 
   for (let message of yield* each(socket)) {
-    console.log('Message from server', message);
+    console.log("Message from server", message);
     yield* each.next();
   }
 });
