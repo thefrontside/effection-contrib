@@ -64,7 +64,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                   <span>/</span>
                   {pkg.name}
                 </span>
-                <span class="text-3xl mx-2 align-middle">{pkg.version}</span>
+                <span class="text-3xl mx-2 align-middle">v{pkg.version}</span>
                 <a href={pkg.source.toString()} class="[&>*]:inline-block rounded-full bg-gray-200 px-2 py-1">
                   <IconGithub />
                   <span class="px-1">{REPOSITORY_NAME}</span>
