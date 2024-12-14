@@ -6,14 +6,15 @@ of 'open', 'close', 'error', and 'message' event handlers, `useWebSocket()`
 organizes them for you so that you can consume all events from the server as a
 plain stream that has state-readiness and proper error handling baked in.
 
+---
+
 To use a websocket import the `useWebSocket()` operation which behaves just like
 the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 constructor.
 
 ```ts
 import { main, each } from "effection";
-import { useWebSocket } from "
-
+import { useWebSocket } from "@effection-contrib/websocket";
 
 await main(function*() {
   let socket = yield* useWebSocket("ws://websocket.example.org");
@@ -39,7 +40,7 @@ You can also instantiate a websocket separately and pass it along to
 `useWebSocket()`. This is helpful for runtimes such as NodeJS prior to version
 21 that do not have built in support for websocket.
 
-```
+```ts
 import { createWebSocket } from "my-websocket-client";
 
 await main(function*() {
