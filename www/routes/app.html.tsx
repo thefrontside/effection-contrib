@@ -36,7 +36,7 @@ export function* useAppHtml({
       href={isDenoDeploy ? "/contrib" : "/"}
     >
       <span class="hidden md:inline-flex">
-        Contrib
+        Contribs
       </span>
     </a>,
 
