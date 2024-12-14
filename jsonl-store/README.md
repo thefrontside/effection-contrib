@@ -1,7 +1,10 @@
 # JSONL Streaming Store
 
-JSONL Streaming Store provides an easy way to store documents in JSONL files. This is useful when you need cache responses from HTTP requests for later processing. This API focuses on providing streaming APIs for working
-with the contents of the store with a glob selector syntax for choosing which files to read.
+JSONL Streaming Store provides an easy way to store documents in JSONL files.
+This is useful when you need cache responses from HTTP requests for later
+processing. This API focuses on providing streaming APIs for working with the
+contents of the store with a glob selector syntax for choosing which files to
+read.
 
 ---
 
@@ -29,8 +32,8 @@ ensures that you do not forget to add a trailing forward slash to the path.
 ```ts
 import { run } from "npm:effection@4.0.0-alpha.3";
 import {
-  StoreContext,
   JSONLStore,
+  StoreContext,
   useStore,
 } from "jsr:@effection-contrib/jsonl-store";
 

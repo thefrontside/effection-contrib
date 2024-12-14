@@ -42,8 +42,7 @@ export function* usePackage(workspace: string): Operation<Package> {
   const denoJsonPath = `${workspace}/deno.json`;
 
   const config: { private?: boolean } = yield* call(
-    async () =>
-      JSON.parse(await Deno.readTextFile(denoJsonPath)),
+    async () => JSON.parse(await Deno.readTextFile(denoJsonPath)),
   );
 
   if (config.private === true) {
@@ -53,11 +52,11 @@ export function* usePackage(workspace: string): Operation<Package> {
   let denoJson: z.infer<typeof DenoJson> | undefined;
 
   try {
-    denoJson = DenoJson.parse(config)
+    denoJson = DenoJson.parse(config);
   } catch (e) {
     if (e instanceof z.ZodError) {
       logPrettyZodError(e);
-      throw new Error(`${denoJsonPath} failed validation`)
+      throw new Error(`${denoJsonPath} failed validation`);
     } else {
       throw e;
     }
