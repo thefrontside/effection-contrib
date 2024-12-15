@@ -54,7 +54,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
         description: `${pkg.MDXDescription()}`,
         pageTitle: `${pkg.packageName} | Effection Contribs`,
       });
-      
+
       const score = yield* pkg.jsrScore();
 
       return (
@@ -68,7 +68,10 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                   {pkg.name}
                 </span>
                 <span class="text-3xl mx-2 align-middle">v{pkg.version}</span>
-                <a href={pkg.source.toString()} class="[&>*]:inline-block rounded-full bg-gray-200 px-2 py-1">
+                <a
+                  href={pkg.source.toString()}
+                  class="[&>*]:inline-block rounded-full bg-gray-200 px-2 py-1"
+                >
                   <IconGithub />
                   <span class="px-1">{REPOSITORY_NAME}</span>
                   <IconExternal />
@@ -76,16 +79,30 @@ export function packageRoute(): SitemapRoute<JSXElement> {
               </div>
               <div class="space-x-1">
                 <a href={`${pkg.jsr}`} class="inline-block align-middle">
-                  <img src={`${pkg.jsrBadge}`} alt="JSR Badge"/>
+                  <img src={`${pkg.jsrBadge}`} alt="JSR Badge" />
                 </a>
                 <a href={`${pkg.npm}`} class="inline-block align-middle">
-                  <img src={`${pkg.npmVersionBadge}`} alt="NPM Badge with published version"/>
+                  <img
+                    src={`${pkg.npmVersionBadge}`}
+                    alt="NPM Badge with published version"
+                  />
                 </a>
-                <a href={`${pkg.bundlephobia}`} class="inline-block align-middle">
+                <a
+                  href={`${pkg.bundlephobia}`}
+                  class="inline-block align-middle"
+                >
                   <img src={`${pkg.bundleSizeBadge}`} alt="Bundle size badge" />
                 </a>
-                <img src={`${pkg.dependencyCountBadge}`} class="inline-block" alt="Dependency count badge" />
-                <img src={`${pkg.treeShakingSupportBadge}`} class="inline-block" alt="Tree shaking support badge" />
+                <img
+                  src={`${pkg.dependencyCountBadge}`}
+                  class="inline-block"
+                  alt="Dependency count badge"
+                />
+                <img
+                  src={`${pkg.treeShakingSupportBadge}`}
+                  class="inline-block"
+                  alt="Tree shaking support badge"
+                />
               </div>
               <div class="py-3">
                 <Exports pkg={pkg} />
@@ -93,14 +110,13 @@ export function packageRoute(): SitemapRoute<JSXElement> {
             </header>
             <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
               <article class="prose min-w-0 lg:col-span-7 lg:row-start-1">
-                  <>
-                    {yield* useMarkdown(pkg.readme)}
-                  </>
+                <>
+                  {yield* useMarkdown(pkg.readme)}
+                </>
                 <h2 class="mb-0">API</h2>
                 {yield* API({ pkg })}
               </article>
               <aside class="max-lg:row-start-1 lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
-
               </aside>
             </div>
           </>
