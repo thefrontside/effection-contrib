@@ -82,7 +82,7 @@ function createJSRClient(token: string): JSRClient {
               Authorization: `Bearer ${token}`,
             },
           },
-        ),
+        )
       );
 
       if (response.ok) {
@@ -100,7 +100,7 @@ function createJSRClient(token: string): JSRClient {
               Authorization: `Bearer ${token}`,
             },
           },
-        ),
+        )
       );
 
       if (response.ok) {

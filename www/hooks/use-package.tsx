@@ -26,7 +26,7 @@ export interface Package {
    */
   scope: string;
   /**
-   * Name of the package without the scope 
+   * Name of the package without the scope
    */
   name: string;
   /**
@@ -38,7 +38,7 @@ export interface Package {
    */
   version: string;
   /**
-   * Source code URL 
+   * Source code URL
    */
   source: URL;
   /**
@@ -84,7 +84,7 @@ export interface Package {
   /**
    * JSR Score
    */
-  jsrScore: () => Operation<PackageScoreType>; 
+  jsrScore: () => Operation<PackageScoreType>;
   /**
    * Generated docs
    */
@@ -158,7 +158,7 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   if (!scope) throw new Error(`Expected a scope but got ${scope}`);
   if (!name) throw new Error(`Expected a package name but got ${name}`);
-  
+
   const entrypoints: Record<string, URL> = {};
   for (const key of Object.keys(exports)) {
     entrypoints[key] = new URL(join(workspacePath, exports[key]), "file://");
@@ -192,14 +192,29 @@ export function* usePackage(workspace: string): Operation<Package> {
 
   return {
     workspace: workspace.replace("./", ""),
-    jsr: new URL(`./${denoJson.name}`, 'https://jsr.io/'),
-    jsrBadge: new URL(`./${denoJson.name}`, 'https://jsr.io/badges/'),
-    npm: new URL(`./${denoJson.name}`, 'https://www.npmjs.com/package/'),
-    bundleSizeBadge: new URL(`./${denoJson.name}/${denoJson.version}`, 'https://img.shields.io/bundlephobia/minzip/'),
-    npmVersionBadge: new URL(`./${denoJson.name}`, 'https://img.shields.io/npm/v/'),
-    bundlephobia: new URL(`./${denoJson.name}/${denoJson.version}`, 'https://bundlephobia.com/package/'),
-    dependencyCountBadge: new URL(`./${denoJson.name}`, 'https://badgen.net/bundlephobia/dependency-count/'),
-    treeShakingSupportBadge: new URL(`./${denoJson.name}`, 'https://badgen.net/bundlephobia/tree-shaking/'),
+    jsr: new URL(`./${denoJson.name}`, "https://jsr.io/"),
+    jsrBadge: new URL(`./${denoJson.name}`, "https://jsr.io/badges/"),
+    npm: new URL(`./${denoJson.name}`, "https://www.npmjs.com/package/"),
+    bundleSizeBadge: new URL(
+      `./${denoJson.name}/${denoJson.version}`,
+      "https://img.shields.io/bundlephobia/minzip/",
+    ),
+    npmVersionBadge: new URL(
+      `./${denoJson.name}`,
+      "https://img.shields.io/npm/v/",
+    ),
+    bundlephobia: new URL(
+      `./${denoJson.name}/${denoJson.version}`,
+      "https://bundlephobia.com/package/",
+    ),
+    dependencyCountBadge: new URL(
+      `./${denoJson.name}`,
+      "https://badgen.net/bundlephobia/dependency-count/",
+    ),
+    treeShakingSupportBadge: new URL(
+      `./${denoJson.name}`,
+      "https://badgen.net/bundlephobia/tree-shaking/",
+    ),
     path: workspacePath,
     packageName: denoJson.name,
     scope,
@@ -211,7 +226,7 @@ export function* usePackage(workspace: string): Operation<Package> {
     version: denoJson.version,
     jsrScore: function* getJSRScore() {
       const client = yield* useJSRClient();
-      return yield* client.getPackageScore({ scope, package: name })
+      return yield* client.getPackageScore({ scope, package: name });
     },
     MDXContent: () => content,
     MDXDescription: () => <>{file.data?.meta?.description}</>,

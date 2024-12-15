@@ -23,8 +23,8 @@ if (import.meta.main) {
     }
 
     yield* initJSRClient({
-      token: Deno.env.get("JSR_API") ?? "example"
-    })
+      token: Deno.env.get("JSR_API") ?? "example",
+    });
 
     let revolution = createRevolution({
       app: [
