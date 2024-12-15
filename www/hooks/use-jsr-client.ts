@@ -132,7 +132,7 @@ function createExampleJSRClient(): JSRClient {
       return {
         scope: "effection-contrib",
         name: "websocket",
-        description: "Use the WebSocket API as an Effection resourc",
+        description: "Use the WebSocket API as an Effection resource.",
         runtimeCompat: {
           browser: true,
           deno: true,

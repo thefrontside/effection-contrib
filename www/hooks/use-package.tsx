@@ -1,4 +1,4 @@
-import { all, call, type Operation } from "effection";
+import { all, call, createContext, type Operation } from "effection";
 import { join, resolve } from "jsr:@std/path@1.0.6";
 import type { VFile } from "npm:vfile@6.0.3";
 import { z } from "npm:zod@3.23.8";
@@ -9,7 +9,11 @@ import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
 import { useDescriptionParse } from "./use-description-parse.tsx";
 import { REPOSITORY_DEFAULT_BRANCH_URL } from "../config.ts";
-import { PackageScoreType, useJSRClient } from "./use-jsr-client.ts";
+import {
+  PackageDetailsType,
+  PackageScoreType,
+  useJSRClient,
+} from "./use-jsr-client.ts";
 
 export interface Package {
   /**
@@ -83,7 +87,7 @@ export interface Package {
   /**
    * JSR Score
    */
-  jsrScore: () => Operation<PackageScoreType>;
+  jsrPackageDetails: () => Operation<[PackageDetailsType, PackageScoreType]>;
   /**
    * Generated docs
    */
@@ -107,117 +111,131 @@ export const DenoJson = z.object({
 
 export const DEFAULT_MODULE_KEY = ".";
 
-export function* usePackage(workspace: string): Operation<Package> {
-  const workspacePath = resolve(Deno.cwd(), workspace);
+const PackageContext = createContext<Package>("package");
 
-  const config: { private?: boolean } = yield* call(
-    async () =>
-      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
-  );
+export function* initPackageContext(workspace: string) {
+  const pkg = yield* createPackage(workspace);
+  return yield* PackageContext.set(pkg);
+}
 
-  if (config.private === true) {
-    throw new PrivatePackageError(workspace);
-  }
+export function* usePackage(): Operation<Package> {
+  return yield* PackageContext;
+}
 
-  const denoJson = DenoJson.parse(config);
+function* createPackage(workspace: string) {
+    const workspacePath = resolve(Deno.cwd(), workspace);
 
-  const readme = yield* call(async () => {
-    try {
-      return await Deno.readTextFile(join(workspacePath, "README.md"));
-    } catch {
-      return "Could not find a README.md file";
+    const config: { private?: boolean } = yield* call(
+      async () =>
+        JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
+    );
+  
+    if (config.private === true) {
+      throw new PrivatePackageError(workspace);
     }
-  });
-
-  let mod = yield* useMDX(readme);
-
-  const content = mod.default({});
-
-  let file: VFile = yield* useDescriptionParse(readme);
-
-  const exports = typeof denoJson.exports === "string"
-    ? {
-      [DEFAULT_MODULE_KEY]: denoJson.exports,
-    }
-    : denoJson.exports;
-
-  const [, scope, name] = denoJson.name.match(/@(.*)\/(.*)/) ?? [];
-
-  if (!scope) throw new Error(`Expected a scope but got ${scope}`);
-  if (!name) throw new Error(`Expected a package name but got ${name}`);
-
-  const entrypoints: Record<string, URL> = {};
-  for (const key of Object.keys(exports)) {
-    entrypoints[key] = new URL(join(workspacePath, exports[key]), "file://");
-  }
-
-  let docs: Package["docs"] = {};
-  for (const key of Object.keys(entrypoints)) {
-    const docNodes = yield* useDenoDoc(String(entrypoints[key]));
-    docs[key] = yield* all(docNodes.map(function* (node) {
-      if (node.jsDoc && node.jsDoc.doc) {
-        try {
-          const mod = yield* useMDX(node.jsDoc.doc);
-          return {
-            id: exportHash(key, node),
-            ...node,
-            MDXDoc: () => mod.default({}),
-          };
-        } catch (e) {
-          console.error(
-            `Could not parse doc string for ${node.name} at ${node.location}`,
-            e,
-          );
-        }
+  
+    const denoJson = DenoJson.parse(config);
+  
+    const readme = yield* call(async () => {
+      try {
+        return await Deno.readTextFile(join(workspacePath, "README.md"));
+      } catch {
+        return "Could not find a README.md file";
       }
-      return {
-        id: exportHash(key, node),
-        ...node,
-      };
-    }));
-  }
-
-  return {
-    workspace: workspace.replace("./", ""),
-    jsr: new URL(`./${denoJson.name}`, "https://jsr.io/"),
-    jsrBadge: new URL(`./${denoJson.name}`, "https://jsr.io/badges/"),
-    npm: new URL(`./${denoJson.name}`, "https://www.npmjs.com/package/"),
-    bundleSizeBadge: new URL(
-      `./${denoJson.name}/${denoJson.version}`,
-      "https://img.shields.io/bundlephobia/minzip/",
-    ),
-    npmVersionBadge: new URL(
-      `./${denoJson.name}`,
-      "https://img.shields.io/npm/v/",
-    ),
-    bundlephobia: new URL(
-      `./${denoJson.name}/${denoJson.version}`,
-      "https://bundlephobia.com/package/",
-    ),
-    dependencyCountBadge: new URL(
-      `./${denoJson.name}`,
-      "https://badgen.net/bundlephobia/dependency-count/",
-    ),
-    treeShakingSupportBadge: new URL(
-      `./${denoJson.name}`,
-      "https://badgen.net/bundlephobia/tree-shaking/",
-    ),
-    path: workspacePath,
-    packageName: denoJson.name,
-    scope,
-    source: new URL(workspace, REPOSITORY_DEFAULT_BRANCH_URL),
-    name,
-    exports,
-    readme,
-    docs,
-    version: denoJson.version,
-    jsrScore: function* getJSRScore() {
-      const client = yield* useJSRClient();
-      return yield* client.getPackageScore({ scope, package: name });
-    },
-    MDXContent: () => content,
-    MDXDescription: () => <>{file.data?.meta?.description}</>,
-  };
+    });
+  
+    let mod = yield* useMDX(readme);
+  
+    const content = mod.default({});
+  
+    let file: VFile = yield* useDescriptionParse(readme);
+  
+    const exports = typeof denoJson.exports === "string"
+      ? {
+        [DEFAULT_MODULE_KEY]: denoJson.exports,
+      }
+      : denoJson.exports;
+  
+    const [, scope, name] = denoJson.name.match(/@(.*)\/(.*)/) ?? [];
+  
+    if (!scope) throw new Error(`Expected a scope but got ${scope}`);
+    if (!name) throw new Error(`Expected a package name but got ${name}`);
+  
+    const entrypoints: Record<string, URL> = {};
+    for (const key of Object.keys(exports)) {
+      entrypoints[key] = new URL(join(workspacePath, exports[key]), "file://");
+    }
+  
+    let docs: Package["docs"] = {};
+    for (const key of Object.keys(entrypoints)) {
+      const docNodes = yield* useDenoDoc(String(entrypoints[key]));
+      docs[key] = yield* all(docNodes.map(function* (node) {
+        if (node.jsDoc && node.jsDoc.doc) {
+          try {
+            const mod = yield* useMDX(node.jsDoc.doc);
+            return {
+              id: exportHash(key, node),
+              ...node,
+              MDXDoc: () => mod.default({}),
+            };
+          } catch (e) {
+            console.error(
+              `Could not parse doc string for ${node.name} at ${node.location}`,
+              e,
+            );
+          }
+        }
+        return {
+          id: exportHash(key, node),
+          ...node,
+        };
+      }));
+    }
+  
+    return {
+      workspace: workspace.replace("./", ""),
+      jsr: new URL(`./${denoJson.name}`, "https://jsr.io/"),
+      jsrBadge: new URL(`./${denoJson.name}`, "https://jsr.io/badges/"),
+      npm: new URL(`./${denoJson.name}`, "https://www.npmjs.com/package/"),
+      bundleSizeBadge: new URL(
+        `./${denoJson.name}/${denoJson.version}`,
+        "https://img.shields.io/bundlephobia/minzip/",
+      ),
+      npmVersionBadge: new URL(
+        `./${denoJson.name}`,
+        "https://img.shields.io/npm/v/",
+      ),
+      bundlephobia: new URL(
+        `./${denoJson.name}/${denoJson.version}`,
+        "https://bundlephobia.com/package/",
+      ),
+      dependencyCountBadge: new URL(
+        `./${denoJson.name}`,
+        "https://badgen.net/bundlephobia/dependency-count/",
+      ),
+      treeShakingSupportBadge: new URL(
+        `./${denoJson.name}`,
+        "https://badgen.net/bundlephobia/tree-shaking/",
+      ),
+      path: workspacePath,
+      packageName: denoJson.name,
+      scope,
+      source: new URL(workspace, REPOSITORY_DEFAULT_BRANCH_URL),
+      name,
+      exports,
+      readme,
+      docs,
+      version: denoJson.version,
+      jsrPackageDetails: function* getJSRPackageDetails() {
+        const client = yield* useJSRClient();
+        return yield* all([
+          client.getPackageDetails({ scope, package: name }),
+          client.getPackageScore({ scope, package: name }),
+        ]);
+      },
+      MDXContent: () => content,
+      MDXDescription: () => <>{file.data?.meta?.description}</>,
+    };
 }
 
 function exportHash(exportName: string, doc: DocNode): string {
