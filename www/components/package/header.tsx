@@ -1,4 +1,3 @@
-import { Exports } from "../../components/exports.tsx";
 import { usePackage } from "../../hooks/use-package.tsx";
 import { PackageSourceLink } from "./source-link.tsx";
 
@@ -53,9 +52,6 @@ export function PackageHeader() {
               alt="Tree shaking support badge"
             />
           </a>
-        </div>
-        <div class="py-3">
-          <Exports pkg={pkg} />
         </div>
       </header>
     );

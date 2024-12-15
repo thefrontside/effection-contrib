@@ -1,19 +1,21 @@
 import { type JSXElement, useParams } from "revolution";
-import { initPackageContext } from "../hooks/use-package.tsx";
+import { initPackageContext, readPackageConfig } from "../hooks/use-package.tsx";
 import { useAppHtml } from "./app.html.tsx";
 import type { RoutePath, SitemapRoute } from "effection-www/plugins/sitemap.ts";
-import { usePackages } from "../hooks/use-packages.ts";
 import { API } from "../components/api.tsx";
 import { useMarkdown } from "../hooks/use-markdown.tsx";
 import { PackageHeader } from "../components/package/header.tsx";
-import { PackageSourceLink } from "../components/package/source-link.tsx";
+import { PackageExports } from "../components/package/exports.tsx";
+import { readPackages } from "../hooks/read-packages.ts";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
     *routemap(pathname) {
       let paths: RoutePath[] = [];
-      let packages = yield* usePackages();
-      for (let pkg of packages) {
+      let configs = yield* readPackages({ 
+        excludePrivate: true 
+      });
+      for (let pkg of configs) {
         paths.push({
           pathname: pathname({ workspace: pkg.workspace }),
         });
@@ -24,7 +26,8 @@ export function packageRoute(): SitemapRoute<JSXElement> {
       const params = yield* useParams<{ workspace: string }>();
 
       try {
-        let pkg = yield* initPackageContext(params.workspace);
+        let config = yield* readPackageConfig(params.workspace);
+        let pkg = yield* initPackageContext(config);
 
         const AppHTML = yield* useAppHtml({
           title: `${pkg.packageName}`,
@@ -39,6 +42,9 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                 <article class="min-w-0 lg:col-span-7 lg:row-start-1">
                   {yield* PackageHeader()()}
                   <div class="prose">
+                    <div class="mb-5">
+                      {yield* PackageExports()()}
+                    </div>
                     {yield* useMarkdown(pkg.readme)}
                     <h2 class="mb-0">API</h2>
                     {yield* API()()}

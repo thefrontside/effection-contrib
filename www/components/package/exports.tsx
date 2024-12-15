@@ -1,21 +1,24 @@
 import { join } from "jsr:@std/path@1.0.6";
-import type { JSXElement } from "revolution/jsx-runtime";
 
-import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
-import { Keyword, Punctuation } from "./tokens.tsx";
+import { usePackage, type RenderableDocNode } from "../../hooks/use-package.tsx";
+import { Keyword, Punctuation } from "../tokens.tsx";
 
-export function Exports({ pkg }: { pkg: Package }): JSXElement {
-  return (
-    <>
-      {Object.keys(pkg.docs).map((exportName) => (
-        <PackageExport
-          packageName={pkg.packageName}
-          exportName={exportName}
-          docs={pkg.docs[exportName]}
-        />
-      ))}
-    </>
-  );
+export function PackageExports() {
+  return function* () {
+    const pkg = yield* usePackage();
+
+    return (
+      <>
+        {Object.keys(pkg.docs).map((exportName) => (
+          <PackageExport
+            packageName={pkg.packageName}
+            exportName={exportName}
+            docs={pkg.docs[exportName]}
+          />
+        ))}
+      </>
+    );
+  }
 }
 
 interface PackageExportOptions {
