@@ -9,6 +9,7 @@ import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
 import { useDescriptionParse } from "./use-description-parse.tsx";
 import { REPOSITORY_DEFAULT_BRANCH_URL } from "../config.ts";
+import { PackageScoreType, useJSRClient } from "./use-jsr-client.ts";
 
 export interface Package {
   /**
@@ -79,6 +80,10 @@ export interface Package {
    * Tree Shaking Support Badge URL
    */
   treeShakingSupportBadge: URL;
+  /**
+   * JSR Score
+   */
+  jsrScore: () => Operation<PackageScoreType>; 
   /**
    * Generated docs
    */
@@ -191,6 +196,10 @@ export function* usePackage(workspace: string): Operation<Package> {
     readme,
     docs,
     version: denoJson.version,
+    jsrScore: function* getJSRScore() {
+      const client = yield* useJSRClient();
+      return yield* client.getPackageScore({ scope, package: name })
+    },
     MDXContent: () => content,
     MDXDescription: () => <>{file.data?.meta?.description}</>,
   };

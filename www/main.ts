@@ -11,11 +11,15 @@ import { rebasePlugin } from "effection-www/plugins/rebase.ts";
 import { assetsRoute } from "./routes/assets-route.ts";
 import { indexRoute } from "./routes/index.tsx";
 import { packageRoute } from "./routes/package.tsx";
+import { initJSRClient } from "./hooks/use-jsr-client.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   await main(function* () {
     yield* initDenoDeploy();
+    yield* initJSRClient({
+      token: Deno.env.get("JSR_API") ?? "example"
+    })
 
     let revolution = createRevolution({
       app: [
