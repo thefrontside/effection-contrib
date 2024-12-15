@@ -10,13 +10,13 @@ const PackageScore = z.object({
   hasReadme: z.boolean(),
   hasReadmeExamples: z.boolean(),
   allEntrypointsDocs: z.boolean(),
-  percentageDocumentedSymbols: z.number().min(0).max(1),
   allFastCheck: z.boolean(),
   hasProvenance: z.boolean(),
   hasDescription: z.boolean(),
   atLeastOneRuntimeCompatible: z.boolean(),
   multipleRuntimesCompatible: z.boolean(),
-  total: z.number().min(0).max(1),
+  percentageDocumentedSymbols: z.number().min(0).max(1),
+  total: z.number(),
 });
 
 const PackageDetails = z.object({
@@ -24,45 +24,40 @@ const PackageDetails = z.object({
   name: z.string(),
   description: z.string(),
   runtimeCompat: z.object({
-    browser: z.boolean(),
-    deno: z.boolean(),
-    node: z.boolean(),
-    workerd: z.boolean(),
-    bun: z.boolean(),
+    browser: z.boolean().optional(),
+    deno: z.boolean().optional(),
+    node: z.boolean().optional(),
+    bun: z.boolean().optional(),
+    workerd: z.boolean().optional()
   }),
-  createdAt: z.string().datetime({ precision: 3 }),
-  updatedAt: z.string().datetime({ precision: 3 }),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   githubRepository: z.object({
+    id: z.number(),
     owner: z.string(),
     name: z.string(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
   }),
-  score: z.number().min(0).max(1),
+  score: z.number().min(0).max(100),
 });
 
-export type PackageScoreType = z.infer<typeof PackageScore>;
-export type PackageDetailsType = z.infer<typeof PackageDetails>;
+export type PackageScoreResult = z.infer<typeof PackageScore>;
+export type PackageDetailsResult = z.infer<typeof PackageDetails>;
 
 export interface JSRClient {
   getPackageScore: (
     params: GetPackageDetailsParams,
-  ) => Operation<PackageScoreType>;
+  ) => Operation<z.SafeParseReturnType<unknown, PackageScoreResult>>;
   getPackageDetails: (
     params: GetPackageDetailsParams,
-  ) => Operation<PackageDetailsType>;
+  ) => Operation<z.SafeParseReturnType<unknown, PackageDetailsResult>>;
 }
 
 const JSRClientContext = createContext<JSRClient>("jsr-client");
 
 export function* initJSRClient({ token }: { token: string }) {
-  let client: JSRClient | undefined;
-  if (token === "example") {
-    console.info(
-      `JSR Client Context is using the example token; will return example data`,
-    );
-    client = createExampleJSRClient();
-  } else {
-    client = createJSRClient(token);
-  }
+  let client = createJSRClient(token);
 
   return yield* JSRClientContext.set(client);
 }
@@ -86,7 +81,8 @@ function createJSRClient(token: string): JSRClient {
       );
 
       if (response.ok) {
-        return PackageScore.parse(yield* call(() => response.json()));
+        const json = yield* call(() => response.json());
+        return yield* call(() => PackageScore.safeParseAsync(json));
       }
 
       throw new Error(`${response.status}: ${response.statusText}`);
@@ -104,50 +100,11 @@ function createJSRClient(token: string): JSRClient {
       );
 
       if (response.ok) {
-        return PackageDetails.parse(yield* call(() => response.json()));
+        const json = yield* call(() => response.json());
+        return yield* call(() => PackageDetails.safeParseAsync(json));
       }
 
       throw new Error(`${response.status}: ${response.statusText}`);
-    },
-  };
-}
-
-function createExampleJSRClient(): JSRClient {
-  return {
-    *getPackageScore() {
-      return {
-        hasReadme: true,
-        hasReadmeExamples: true,
-        allEntrypointsDocs: true,
-        percentageDocumentedSymbols: 1,
-        allFastCheck: true,
-        hasProvenance: true,
-        hasDescription: true,
-        atLeastOneRuntimeCompatible: true,
-        multipleRuntimesCompatible: true,
-        total: 1,
-      };
-    },
-    *getPackageDetails() {
-      return {
-        scope: "effection-contrib",
-        name: "websocket",
-        description: "Use the WebSocket API as an Effection resource.",
-        runtimeCompat: {
-          browser: true,
-          deno: true,
-          node: true,
-          workerd: true,
-          bun: true,
-        },
-        createdAt: "2024-12-15T02:18:26.624Z",
-        updatedAt: "2024-12-15T02:18:26.624Z",
-        githubRepository: {
-          owner: "thefrontside",
-          name: "effection-contribs",
-        },
-        score: 1,
-      };
     },
   };
 }

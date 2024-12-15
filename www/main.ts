@@ -17,8 +17,14 @@ import { initJSRClient } from "./hooks/use-jsr-client.ts";
 if (import.meta.main) {
   await main(function* () {
     yield* initDenoDeploy();
+
+    const token = Deno.env.get("JSR_API") ?? ""
+    if (token === "") {
+      console.log("Missing JSR API token; expect score card not to load.");
+    }
+  
     yield* initJSRClient({
-      token: Deno.env.get("JSR_API") ?? "example",
+      token,
     });
 
     let revolution = createRevolution({
