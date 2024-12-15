@@ -6,6 +6,7 @@ import { usePackages } from "../hooks/use-packages.ts";
 import { API } from "../components/api.tsx";
 import { useMarkdown } from "../hooks/use-markdown.tsx";
 import { PackageHeader } from "../components/package/header.tsx";
+import { PackageSourceLink } from "../components/package/source-link.tsx";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
@@ -34,17 +35,16 @@ export function packageRoute(): SitemapRoute<JSXElement> {
         return (
           <AppHTML>
             <>
-              {yield* PackageHeader()()}
               <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
-                <article class="prose min-w-0 lg:col-span-7 lg:row-start-1">
-                  <>
+                <article class="min-w-0 lg:col-span-7 lg:row-start-1">
+                  {yield* PackageHeader()()}
+                  <div class="prose">
                     {yield* useMarkdown(pkg.readme)}
-                  </>
-                  <h2 class="mb-0">API</h2>
-                  {yield* API()()}
+                    <h2 class="mb-0">API</h2>
+                    {yield* API()()}
+                  </div>
                 </article>
                 <aside class="max-lg:row-start-1 lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
-                  
                 </aside>
               </div>
             </>

@@ -1,9 +1,6 @@
 import { Exports } from "../../components/exports.tsx";
-import { IconGithub } from "effection-www/components/icons/github.tsx";
-import { REPOSITORY_NAME } from "../../config.ts";
-import { IconExternal } from "effection-www/components/icons/external.tsx";
-
 import { usePackage } from "../../hooks/use-package.tsx";
+import { PackageSourceLink } from "./source-link.tsx";
 
 export function PackageHeader() {
   return function* () {
@@ -18,14 +15,7 @@ export function PackageHeader() {
             {pkg.name}
           </span>
           <span class="text-3xl mx-2 align-middle">v{pkg.version}</span>
-          <a
-            href={pkg.source.toString()}
-            class="[&>*]:inline-block rounded-full bg-gray-200 px-2 py-1"
-          >
-            <IconGithub />
-            <span class="px-1">{REPOSITORY_NAME}</span>
-            <IconExternal />
-          </a>
+          {yield* PackageSourceLink()()}
         </div>
         <div class="space-x-1">
           <a href={`${pkg.jsr}`} class="inline-block align-middle">
@@ -43,16 +33,26 @@ export function PackageHeader() {
           >
             <img src={`${pkg.bundleSizeBadge}`} alt="Bundle size badge" />
           </a>
-          <img
-            src={`${pkg.dependencyCountBadge}`}
-            class="inline-block"
-            alt="Dependency count badge"
-          />
-          <img
-            src={`${pkg.treeShakingSupportBadge}`}
-            class="inline-block"
-            alt="Tree shaking support badge"
-          />
+          <a
+            href={`${pkg.bundlephobia}`}
+            class="inline-block align-middle"
+          >
+            <img
+              src={`${pkg.dependencyCountBadge}`}
+              class="inline-block"
+              alt="Dependency count badge"
+            />
+          </a>
+          <a
+            href={`${pkg.bundlephobia}`}
+            class="inline-block align-middle"
+          >
+            <img
+              src={`${pkg.treeShakingSupportBadge}`}
+              class="inline-block"
+              alt="Tree shaking support badge"
+            />
+          </a>
         </div>
         <div class="py-3">
           <Exports pkg={pkg} />
