@@ -7,6 +7,7 @@ import { useMarkdown } from "../hooks/use-markdown.tsx";
 import { PackageHeader } from "../components/package/header.tsx";
 import { PackageExports } from "../components/package/exports.tsx";
 import { readPackages } from "../hooks/read-packages.ts";
+import { ScoreCard } from "../components/score-card.tsx";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
@@ -51,21 +52,23 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                   </div>
                 </article>
                 <aside class="max-lg:row-start-1 lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
+                  {yield* ScoreCard()()}
                 </aside>
               </div>
             </>
           </AppHTML>
         );
-      } catch {
+      } catch (e) {
+        console.error(e);
         const AppHTML = yield* useAppHtml({
           title: `${params.workspace}`,
-          description: `Not found`,
+          description: `Failed to load ${params.workspace} due to error.`,
           pageTitle: `${params.workspace} not found`,
         });
         return (
           <AppHTML>
             <p>
-              {params.workspace} not found
+              Failed to load {params.workspace} due to error.
             </p>
           </AppHTML>
         );
