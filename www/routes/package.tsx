@@ -10,6 +10,7 @@ import { useMarkdown } from "../hooks/use-markdown.tsx";
 import { IconGithub } from "effection-www/components/icons/github.tsx";
 import { REPOSITORY_NAME } from "../config.ts";
 import { IconExternal } from "effection-www/components/icons/external.tsx";
+import { jsx } from "revolution/jsx-runtime";
 
 export function packageRoute(): SitemapRoute<JSXElement> {
   return {
@@ -53,6 +54,8 @@ export function packageRoute(): SitemapRoute<JSXElement> {
         description: `${pkg.MDXDescription()}`,
         pageTitle: `${pkg.packageName} | Effection Contribs`,
       });
+      
+      const score = yield* pkg.jsrScore();
 
       return (
         <AppHTML>
@@ -88,13 +91,18 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                 <Exports pkg={pkg} />
               </div>
             </header>
-            <article class="prose">
-                <>
-                  {yield* useMarkdown(pkg.readme)}
-                </>
-              <h2 class="mb-0">API</h2>
-              {yield* API({ pkg })}
-            </article>
+            <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 lg:gap-12">
+              <article class="prose min-w-0 lg:col-span-7 lg:row-start-1">
+                  <>
+                    {yield* useMarkdown(pkg.readme)}
+                  </>
+                <h2 class="mb-0">API</h2>
+                {yield* API({ pkg })}
+              </article>
+              <aside class="max-lg:row-start-1 lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
+
+              </aside>
+            </div>
           </>
         </AppHTML>
       );
