@@ -32,7 +32,9 @@ export function indexRoute(): SitemapRoute<JSXElement> {
               Effection.
             </p>
             <ul class="list-none px-0">
-              {yield* all(configs.map(config => PackageIndexItem({ config })()))}
+              {yield* all(
+                configs.map((config) => PackageIndexItem({ config })()),
+              )}
             </ul>
           </article>
         </AppHTML>

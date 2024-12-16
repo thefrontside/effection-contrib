@@ -5,7 +5,7 @@ import { REPOSITORY_NAME } from "../../config.ts";
 import { usePackage } from "../../hooks/use-package.tsx";
 
 export function PackageSourceLink() {
-  return function*() {
+  return function* () {
     const pkg = yield* usePackage();
 
     return (
@@ -17,6 +17,6 @@ export function PackageSourceLink() {
         <span class="px-1">{REPOSITORY_NAME}</span>
         <IconExternal />
       </a>
-    )
-  }
+    );
+  };
 }

@@ -1,5 +1,8 @@
 import { type JSXElement, useParams } from "revolution";
-import { initPackageContext, readPackageConfig } from "../hooks/use-package.tsx";
+import {
+  initPackageContext,
+  readPackageConfig,
+} from "../hooks/use-package.tsx";
 import { useAppHtml } from "./app.html.tsx";
 import type { RoutePath, SitemapRoute } from "effection-www/plugins/sitemap.ts";
 import { API } from "../components/api.tsx";
@@ -13,8 +16,8 @@ export function packageRoute(): SitemapRoute<JSXElement> {
   return {
     *routemap(pathname) {
       let paths: RoutePath[] = [];
-      let configs = yield* readPackages({ 
-        excludePrivate: true 
+      let configs = yield* readPackages({
+        excludePrivate: true,
       });
       for (let pkg of configs) {
         paths.push({
@@ -73,6 +76,6 @@ export function packageRoute(): SitemapRoute<JSXElement> {
           </AppHTML>
         );
       }
-    }
+    },
   };
 }

@@ -19,8 +19,8 @@ export function ScoreCard() {
     const pkg = yield* usePackage();
     const [details, score] = yield* pkg.jsrPackageDetails();
 
-    const jsrScore =
-      (details.success && details.data && details.data.score) || 0;
+    const jsrScore = (details.success && details.data && details.data.score) ||
+      0;
 
     return (
       <div class="flex flex-col items-center space-y-5 w-full">
@@ -91,17 +91,17 @@ export function ScoreCard() {
             >
               <div>JSR Score</div>
               <div
-                class={`!leading-none md:text-xl ${getScoreTextColorClass(jsrScore)}`}
+                class={`!leading-none md:text-xl ${
+                  getScoreTextColorClass(jsrScore)
+                }`}
               >
                 {jsrScore}%
               </div>
             </a>
           </div>
-          {score.success && score.data ? (
-            <ScoreDescription score={score.data} pkg={pkg} />
-          ) : (
-            <></>
-          )}
+          {score.success && score.data
+            ? <ScoreDescription score={score.data} pkg={pkg} />
+            : <></>}
         </>
       </div>
     );
@@ -113,7 +113,7 @@ interface SupportedEnvironmentProps {
   enabled: boolean;
   width: number;
   height: number;
-  Icon: (props: IconProps) => JSXElement
+  Icon: (props: IconProps) => JSXElement;
 }
 
 function SupportedEnvironment(props: SupportedEnvironmentProps) {
@@ -126,11 +126,11 @@ function SupportedEnvironment(props: SupportedEnvironmentProps) {
         width={`${props.width}`}
         height={`${props.height}`}
         style="max-width: 100%"
-        class={`h-4 md:h-5 ${props.enabled ? "" : "select-none filter grayscale opacity-40"}`}
+        class={`h-4 md:h-5 ${
+          props.enabled ? "" : "select-none filter grayscale opacity-40"
+        }`}
       />
-      {props.enabled ? (
-        <></>
-      ) : (
+      {props.enabled ? <></> : (
         <div
           aria-hidden="true"
           title={`It is unknown whether this package works with ${props.name}`}

@@ -28,7 +28,7 @@ const PackageDetails = z.object({
     deno: z.boolean().optional(),
     node: z.boolean().optional(),
     bun: z.boolean().optional(),
-    workerd: z.boolean().optional()
+    workerd: z.boolean().optional(),
   }),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

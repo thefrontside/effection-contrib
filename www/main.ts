@@ -22,11 +22,11 @@ if (import.meta.main) {
       patchDenoPermissionsQuerySync();
     }
 
-    const token = Deno.env.get("JSR_API") ?? ""
+    const token = Deno.env.get("JSR_API") ?? "";
     if (token === "") {
       console.log("Missing JSR API token; expect score card not to load.");
     }
-  
+
     yield* initJSRClient({
       token,
     });

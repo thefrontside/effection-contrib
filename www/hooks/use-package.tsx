@@ -255,13 +255,19 @@ function* createPackage(config: PackageConfig) {
         client.getPackageDetails({ scope, package: name }),
         client.getPackageScore({ scope, package: name }),
       ]);
-      
+
       if (!details.success) {
-        console.info(`JSR package details response failed validation`, details.error.format())
+        console.info(
+          `JSR package details response failed validation`,
+          details.error.format(),
+        );
       }
 
       if (!score.success) {
-        console.info(`JSR score response failed validation`, score.error.format())
+        console.info(
+          `JSR score response failed validation`,
+          score.error.format(),
+        );
       }
 
       return [details, score];

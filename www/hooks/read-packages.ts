@@ -1,7 +1,9 @@
 import { call, type Operation } from "effection";
 import { PackageConfig, readPackageConfig } from "./use-package.tsx";
 
-export function* readPackages({ excludePrivate }: { excludePrivate: boolean }): Operation<PackageConfig[]> {
+export function* readPackages(
+  { excludePrivate }: { excludePrivate: boolean },
+): Operation<PackageConfig[]> {
   const root = yield* call(async () => {
     try {
       const denoJson = await import("../../deno.json", {

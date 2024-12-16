@@ -1,6 +1,10 @@
 import { call, type Operation } from "effection";
 import type { JSXElement } from "revolution";
-import { usePackage, type Package, type RenderableDocNode } from "../hooks/use-package.tsx";
+import {
+  type Package,
+  type RenderableDocNode,
+  usePackage,
+} from "../hooks/use-package.tsx";
 import type {
   ClassDef,
   InterfaceDef,
@@ -24,13 +28,13 @@ import { useMarkdown } from "../hooks/use-markdown.tsx";
 export function API() {
   return function* (): Operation<JSXElement> {
     const pkg = yield* usePackage();
-    
+
     const elements: JSXElement[] = [];
     for (const exportName of Object.keys(pkg.docs)) {
       const nodes = pkg.docs[exportName];
       for (const node of nodes) {
         const { MDXDoc = () => <></> } = node;
-  
+
         elements.push(
           <section id={node.id}>
             {yield* Type({ node })}
@@ -42,7 +46,7 @@ export function API() {
       }
     }
     return <>{elements}</>;
-  }
+  };
 }
 
 interface TypeProps {
