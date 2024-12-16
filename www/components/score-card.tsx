@@ -1,57 +1,146 @@
 import { Package, usePackage } from "../hooks/use-package.tsx";
+import { type PackageScoreResult } from "../hooks/use-jsr-client.ts";
 import {
-  PackageDetailsResult,
-  type PackageScoreResult,
-} from "../hooks/use-jsr-client.ts";
-import { Check, Cross } from "./package/icons.tsx";
+  Check,
+  CloudflareWorkersIcon,
+  Cross,
+  IconProps,
+  NodeIcon,
+  NPMIcon,
+} from "./package/icons.tsx";
+import { JSRIcon } from "./package/icons.tsx";
+import { JSXElement } from "revolution/jsx-runtime";
+import { DenoIcon } from "./package/icons.tsx";
+import { BunIcon } from "./package/icons.tsx";
+import { BrowserIcon } from "./package/icons.tsx";
 
 export function ScoreCard() {
   return function* () {
     const pkg = yield* usePackage();
     const [details, score] = yield* pkg.jsrPackageDetails();
 
+    const jsrScore =
+      (details.success && details.data && details.data.score) || 0;
+
     return (
-      <div class="flex flex-col items-center space-y-5 w-full border-2 border-cyan-100 rounded-lg p-8">
-        {details.success && details.data ? (
-          <>
-            <a class="flex text-lg space-x-2 font-semibold" href={`${pkg.jsr}`}>
-              <span>Available on</span>
-              <img
-                src="/assets/images/jsr-logo.svg"
-                alt="JSR Logo"
-                class="mr-2"
-              />
-            </a>
-            <div class="flex flex-col md:flex-row gap-2 md:gap-8 items-between">
-              <div class="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-1.5 text-sm font-bold">
-                <div aria-hidden="true">Works with</div>
-                <div class="min-w-content font-semibold select-none">
-                  <div class="flex items-center *:mx-0.5 flex-row-reverse"></div>
+      <div class="flex flex-col items-center space-y-5 w-full">
+        <>
+          <div class="flex flex-col md:flex-row gap-2 md:gap-8 items-between">
+            <div class="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-1.5 text-sm font-bold">
+              <div aria-hidden="true">Published on</div>
+              <div class="flex space-x-2">
+                <a href={`${pkg.jsr}`}>
+                  <JSRIcon class="h-6" />
+                </a>
+                <a href={`${pkg.npm}`}>
+                  <NPMIcon class="h-6" />
+                </a>
+              </div>
+            </div>
+            <div class="flex flex-row md:flex-col items-baseline md:items-end gap-2 md:gap-1.5 text-sm font-bold">
+              <div>TypeScript</div>
+              <span class="text-green-600 text-lg">Yes</span>
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row gap-2 md:gap-8 items-between">
+            <div class="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-1.5 text-sm font-bold">
+              <div aria-hidden="true">Works with</div>
+              <div class="min-w-content font-semibold select-none">
+                <div class="flex items-center *:mx-0.5 flex-row-reverse">
+                  <SupportedEnvironment
+                    name="Cloudflare Workers"
+                    Icon={CloudflareWorkersIcon}
+                    width={416}
+                    height={375}
+                    enabled={details.data?.runtimeCompat.workerd ?? false}
+                  />
+                  <SupportedEnvironment
+                    name="Node.js"
+                    Icon={NodeIcon}
+                    width={256}
+                    height={292}
+                    enabled={details.data?.runtimeCompat.node ?? false}
+                  />
+                  <SupportedEnvironment
+                    name="Deno"
+                    Icon={DenoIcon}
+                    width={512}
+                    height={512}
+                    enabled={details.data?.runtimeCompat.deno ?? false}
+                  />
+                  <SupportedEnvironment
+                    name="Bun"
+                    Icon={BunIcon}
+                    width={435}
+                    height={435}
+                    enabled={details.data?.runtimeCompat.bun ?? false}
+                  />
+                  <SupportedEnvironment
+                    name="Browser"
+                    Icon={BrowserIcon}
+                    width={1200}
+                    height={500}
+                    enabled={details.data?.runtimeCompat.browser ?? false}
+                  />
                 </div>
               </div>
-              <a class="flex flex-row md:flex-col items-baseline md:items-end gap-2 md:gap-1.5 text-sm font-bold"
-              href={`${new URL('./score/', pkg.jsr)}`}
-              >
-                <div>JSR Score</div>
-                <div
-                  class={`!leading-none md:text-xl ${getScoreTextColorClass(details.data.score)}`}
-                >
-                  {details.data.score}%
-                </div>
-              </a>
             </div>
-            {score.success && score.data ? (
-              <ScoreDescription score={score.data} pkg={pkg} />
-            ) : (
-              <></>
-            )}
-          </>
-        ) : (
-          <></>
-        )}
+            <a
+              class="flex flex-row md:flex-col items-baseline md:items-end gap-2 md:gap-1.5 text-sm font-bold"
+              href={`${new URL("./score/", pkg.jsr)}`}
+            >
+              <div>JSR Score</div>
+              <div
+                class={`!leading-none md:text-xl ${getScoreTextColorClass(jsrScore)}`}
+              >
+                {jsrScore}%
+              </div>
+            </a>
+          </div>
+          {score.success && score.data ? (
+            <ScoreDescription score={score.data} pkg={pkg} />
+          ) : (
+            <></>
+          )}
+        </>
       </div>
     );
   };
+}
+
+interface SupportedEnvironmentProps {
+  name: string;
+  enabled: boolean;
+  width: number;
+  height: number;
+  Icon: (props: IconProps) => JSXElement
+}
+
+function SupportedEnvironment(props: SupportedEnvironmentProps) {
+  return (
+    <div
+      class="relative h-4 md:h-5"
+      style={`aspect-ratio: ${props.width} / ${props.height}`}
+    >
+      <props.Icon
+        width={`${props.width}`}
+        height={`${props.height}`}
+        style="max-width: 100%"
+        class={`h-4 md:h-5 ${props.enabled ? "" : "select-none filter grayscale opacity-40"}`}
+      />
+      {props.enabled ? (
+        <></>
+      ) : (
+        <div
+          aria-hidden="true"
+          title={`It is unknown whether this package works with ${props.name}`}
+          class="absolute inset-0 h-full w-full text-jsr-cyan-600 text-center leading-4 md:leading-5 drop-shadow-md font-bold text-md md:text-xl select-none"
+        >
+          ?
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ScoreDescription({

@@ -51,7 +51,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
                     {yield* API()()}
                   </div>
                 </article>
-                <aside class="max-lg:row-start-1 lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
+                <aside class="lg:col-[span_3/_-1] lg:top-0 lg:sticky lg:max-h-screen flex flex-col box-border gap-y-4 -mt-4 pt-4">
                   {yield* ScoreCard()()}
                 </aside>
               </div>
