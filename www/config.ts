@@ -1,4 +1,4 @@
-export const REPOSITORY_NAME = "thefrontside/effection-contribs";
+export const REPOSITORY_NAME = "thefrontside/effection-contrib";
 
 export const REPOSITORY_URL = new URL(
   `./${REPOSITORY_NAME}/`,

@@ -14,10 +14,10 @@ export function indexRoute(): SitemapRoute<JSXElement> {
     },
     *handler() {
       const AppHTML = yield* useAppHtml({
-        title: "Contribs | Effection",
+        title: "Contrib | Effection",
         description:
           "List of community contributed modules that represent emerging consensus on how to do common JavaScript tasks with Effection.",
-        pageTitle: "Contribs | Effection",
+        pageTitle: "Contrib | Effection",
       });
 
       let configs = yield* readPackages({ excludePrivate: true });
@@ -25,7 +25,7 @@ export function indexRoute(): SitemapRoute<JSXElement> {
       return (
         <AppHTML>
           <article class="prose">
-            <h1>Effection Contribs</h1>
+            <h1>Effection Contrib</h1>
             <p>
               Here are a list of community contributed modules that represent
               emerging consensus on how to do common JavaScript tasks with
