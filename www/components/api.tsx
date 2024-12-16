@@ -1,7 +1,6 @@
 import { call, type Operation } from "effection";
 import type { JSXElement } from "revolution";
 import {
-  type Package,
   type RenderableDocNode,
   usePackage,
 } from "../hooks/use-package.tsx";
