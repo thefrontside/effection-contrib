@@ -5,10 +5,9 @@ interface PackageIndexItemProps {
 }
 
 export function PackageIndexItem(props: PackageIndexItemProps) {
-  return function*() {
-
+  return function* () {
     const pkg = yield* initPackageContext(props.config);
-    
+
     return (
       <li class="px-0">
         <h3>
@@ -18,6 +17,6 @@ export function PackageIndexItem(props: PackageIndexItemProps) {
           <pkg.MDXDescription />
         </p>
       </li>
-    )
-  }
+    );
+  };
 }

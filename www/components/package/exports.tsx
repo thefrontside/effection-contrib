@@ -1,6 +1,9 @@
 import { join } from "jsr:@std/path@1.0.6";
 
-import { usePackage, type RenderableDocNode } from "../../hooks/use-package.tsx";
+import {
+  type RenderableDocNode,
+  usePackage,
+} from "../../hooks/use-package.tsx";
 import { Keyword, Punctuation } from "../tokens.tsx";
 
 export function PackageExports() {
@@ -18,7 +21,7 @@ export function PackageExports() {
         ))}
       </>
     );
-  }
+  };
 }
 
 interface PackageExportOptions {
