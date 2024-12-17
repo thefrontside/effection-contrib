@@ -11,7 +11,7 @@ interface UseRetryBackoffOptions {
   timeout?: number;
 }
 
-export interface RetryWithContextDefaults {
+interface RetryWithContextDefaults {
   timeout: number;
 }
 
@@ -79,7 +79,7 @@ export function* initRetryWithBackoff(
   );
 }
 
-export function* ensureContext<T>(Context: ContextType<T>, init: Operation<T>) {
+function* ensureContext<T>(Context: ContextType<T>, init: Operation<T>) {
   if (!(yield* Context.get())) {
     yield* Context.set(yield* init);
   }
