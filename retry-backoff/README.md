@@ -13,7 +13,7 @@ import { useRetryWithBackoff } from "@effection-contrib/retry-backoff";
 
 await main(function* () {
   yield* useRetryWithBackoff(function* () {
-    yield* call(fetch("https://foo.bar/"));
+    yield* call(() => fetch("https://foo.bar/"));
   }, { timeout: 45_000 });
 });
 ```
@@ -31,7 +31,7 @@ import {
 await main(function* () {
   yield* initRetryWithBackoff({ timeout: 45_000 });
   yield* retryWithBackoff(function* () {
-    yield* call(fetch("https://foo.bar/"));
+    yield* call(() => fetch("https://foo.bar/"));
   });
 });
 ```
