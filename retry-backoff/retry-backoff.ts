@@ -1,6 +1,5 @@
 import {
   createContext,
-  type Context as ContextType,
   type Operation,
   race,
   sleep,
@@ -15,7 +14,7 @@ interface RetryWithContextDefaults {
   timeout: number;
 }
 
-const RetryBackoffContext = createContext<RetryWithContextDefaults>(
+export const RetryBackoffContext = createContext<RetryWithContextDefaults>(
   "retry-with-context",
   {
     timeout: 30_000,
@@ -81,25 +80,4 @@ export function* useRetryWithBackoff<T> (
     body(),
     timeout(),
   ]);
-}
-
-export function* initRetryWithBackoff(
-  defaults: RetryWithContextDefaults,
-) {
-  // deno-lint-ignore require-yield
-  function* init(): Operation<RetryWithContextDefaults> {
-    return defaults;
-  }
-
-  return yield* ensureContext(
-    RetryBackoffContext,
-    init(),
-  );
-}
-
-function* ensureContext<T>(Context: ContextType<T>, init: Operation<T>) {
-  if (!(yield* Context.get())) {
-    yield* Context.set(yield* init);
-  }
-  return yield* Context.expect();
 }

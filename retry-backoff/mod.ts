@@ -1,4 +1,4 @@
 export {
   useRetryWithBackoff,
-  initRetryWithBackoff,
+  RetryBackoffContext,
 } from './retry-backoff.ts';
