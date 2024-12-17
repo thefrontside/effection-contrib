@@ -15,7 +15,7 @@ interface RetryWithContextDefaults {
   timeout: number;
 }
 
-const RetryWithBackoffContext = createContext<RetryWithContextDefaults>(
+const RetryBackoffContext = createContext<RetryWithContextDefaults>(
   "retry-with-context",
   {
     timeout: 30_000,
@@ -26,7 +26,7 @@ export function* useRetryWithBackoff<T> (
   fn: () => Operation<T>,
   options?: UseRetryBackoffOptions,
 ) {
-  const defaults = yield* RetryWithBackoffContext.expect();
+  const defaults = yield* RetryBackoffContext.expect();
   const _options = {
     ...defaults,
     ...options,
@@ -74,7 +74,7 @@ export function* initRetryWithBackoff(
   }
 
   return yield* ensureContext(
-    RetryWithBackoffContext,
+    RetryBackoffContext,
     init(),
   );
 }
