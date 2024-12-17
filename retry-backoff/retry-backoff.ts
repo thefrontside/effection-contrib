@@ -22,6 +22,24 @@ const RetryBackoffContext = createContext<RetryWithContextDefaults>(
   }
 );
 
+/**
+ * Retry an operation with incremental cooldown until it exceeds
+ * the configured timeout value. The default timeout is 30 seconds.
+ *
+ * ```js
+ * import { main } from "effection";
+ * import { useRetryWithBackoff } from "@effection-contrib/retry-backoff";
+ * 
+ * await main(function* () {
+ *   yield* useRetryWithBackoff(function* () {
+ *     yield* call(() => fetch("https://foo.bar/"));
+ *   }, { timeout: 45_000 });
+ * });
+ * ```
+ *
+ * @param {Object} [options] - The options object
+ * @param {number} [options.timeout] - Timeout value in milliseconds
+ */
 export function* useRetryWithBackoff<T> (
   fn: () => Operation<T>,
   options?: UseRetryBackoffOptions,
