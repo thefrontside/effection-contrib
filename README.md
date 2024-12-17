@@ -1,4 +1,4 @@
-# effection-contrib
+# [effection-contrib](https://effection-contrib.deno.dev/)
 
 This repository contains a collection of contributions by the community. This
 repository automatically publishes to JSR and NPM. All packages that were used
