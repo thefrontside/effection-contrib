@@ -35,6 +35,7 @@
   },
   "workspace": [
     "./deno-deploy",
+    "./jsonl-store",
     "./task-buffer",
     "./tinyexec",
     "./websocket"
