@@ -70,7 +70,7 @@ jobs:
 
       - run: deno run -A www/tasks/build-npm.ts ${{matrix.workspace}}
 
-      - run: npm publish --access=public --tag=next
+      - run: npm publish --access=public --tag=latest
         working-directory: ${{matrix.workspace}}/build/npm
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
