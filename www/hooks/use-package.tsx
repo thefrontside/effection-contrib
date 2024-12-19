@@ -3,6 +3,7 @@ import { join, resolve } from "jsr:@std/path@1.0.6";
 import type { VFile } from "npm:vfile@6.0.3";
 import { z } from "npm:zod@3.23.8";
 import type { JSXElement } from "revolution";
+import { logPrettyZodError } from "npm:@nortex/pretty-zod-error@2.0.0";
 
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
@@ -137,9 +138,10 @@ export function* readPackageConfig(
 ): Operation<PackageConfig> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
+  const denoJsonPath = `${workspace}/deno.json`;
+
   const config: { private?: boolean } = yield* call(
-    async () =>
-      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
+    async () => JSON.parse(await Deno.readTextFile(denoJsonPath)),
   );
 
   const readme = yield* call(async () => {

@@ -116,7 +116,7 @@ export function* useAppHtml({
       </head>
       <body class="flex flex-col">
         <Header navLinks={navLinks} />
-        <main class="container max-w-screen-2xl mx-auto mb-auto py-5">
+        <main class="container max-w-screen-2xl mx-auto mb-auto p-5">
           {children}
         </main>
         <Footer />

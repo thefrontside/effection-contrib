@@ -16,7 +16,11 @@ import { initJSRClient } from "./hooks/use-jsr-client.ts";
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
   await main(function* () {
-    yield* initDenoDeploy();
+    const denoDeploy = yield* initDenoDeploy();
+
+    if (denoDeploy.isDenoDeploy) {
+      patchDenoPermissionsQuerySync();
+    }
 
     const token = Deno.env.get("JSR_API") ?? "";
     if (token === "") {
@@ -55,4 +59,30 @@ function urlFromServer(server: ServerInfo) {
       server.hostname === "0.0.0.0" ? "localhost" : server.hostname
     }:${server.port}`,
   );
+}
+
+/** see https://github.com/denoland/deploy_feedback/issues/527#issuecomment-2510631720 */
+function patchDenoPermissionsQuerySync() {
+  const permissions = {
+    run: "denied",
+    read: "granted",
+    write: "denied",
+    net: "granted",
+    env: "granted",
+    sys: "denied",
+    ffi: "denied",
+  } as const;
+
+  Deno.permissions.querySync ??= ({ name }) => {
+    return {
+      state: permissions[name],
+      onchange: null,
+      partial: false,
+      addEventListener() {},
+      removeEventListener() {},
+      dispatchEvent() {
+        return false;
+      },
+    };
+  };
 }
