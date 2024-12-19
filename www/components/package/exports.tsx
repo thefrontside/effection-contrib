@@ -1,16 +1,16 @@
 import { join } from "jsr:@std/path@1.0.6";
-import type { JSXElement } from "revolution/jsx-runtime";
 
-import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
-import { Keyword, Punctuation } from "./tokens.tsx";
+import {
+  type RenderableDocNode,
+  usePackage,
+} from "../../hooks/use-package.tsx";
+import { Keyword, Punctuation } from "../tokens.tsx";
 
-export function Exports({ pkg }: { pkg: Package }): JSXElement {
-  return (
-    <>
-      <h2>Exports</h2>{" "}
-      <p class="text-slate-800">
-        Click an export to jump to it's documentation.
-      </p>
+export function PackageExports() {
+  return function* () {
+    const pkg = yield* usePackage();
+
+    return (
       <>
         {Object.keys(pkg.docs).map((exportName) => (
           <PackageExport
@@ -20,8 +20,8 @@ export function Exports({ pkg }: { pkg: Package }): JSXElement {
           />
         ))}
       </>
-    </>
-  );
+    );
+  };
 }
 
 interface PackageExportOptions {

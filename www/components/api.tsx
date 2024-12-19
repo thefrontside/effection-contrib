@@ -1,6 +1,6 @@
 import { call, type Operation } from "effection";
 import type { JSXElement } from "revolution";
-import type { Package, RenderableDocNode } from "../hooks/use-package.tsx";
+import { type RenderableDocNode, usePackage } from "../hooks/use-package.tsx";
 import type {
   ClassDef,
   InterfaceDef,
@@ -21,28 +21,28 @@ import {
 import { useMDX } from "../hooks/use-mdx.tsx";
 import { useMarkdown } from "../hooks/use-markdown.tsx";
 
-interface DescriptionProps {
-  pkg: Package;
-}
+export function API() {
+  return function* (): Operation<JSXElement> {
+    const pkg = yield* usePackage();
 
-export function* API({ pkg }: DescriptionProps): Operation<JSXElement> {
-  const elements: JSXElement[] = [];
-  for (const exportName of Object.keys(pkg.docs)) {
-    const nodes = pkg.docs[exportName];
-    for (const node of nodes) {
-      const { MDXDoc = () => <></> } = node;
+    const elements: JSXElement[] = [];
+    for (const exportName of Object.keys(pkg.docs)) {
+      const nodes = pkg.docs[exportName];
+      for (const node of nodes) {
+        const { MDXDoc = () => <></> } = node;
 
-      elements.push(
-        <section id={node.id}>
-          {yield* Type({ node })}
-          <div class="pl-2 -mt-5">
-            <MDXDoc />
-          </div>
-        </section>,
-      );
+        elements.push(
+          <section id={node.id}>
+            {yield* Type({ node })}
+            <div class="pl-2 -mt-5">
+              <MDXDoc />
+            </div>
+          </section>,
+        );
+      }
     }
-  }
-  return <>{elements}</>;
+    return <>{elements}</>;
+  };
 }
 
 interface TypeProps {

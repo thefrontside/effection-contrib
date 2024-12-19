@@ -13,6 +13,7 @@ if (!workspace) {
 let mod = await import(`../../${workspace}/deno.json`, {
   with: { type: "json" },
 });
+
 let deno = DenoJson.parse(mod.default);
 
 let entryPoints = typeof deno.exports === "string"

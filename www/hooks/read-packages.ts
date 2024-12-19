@@ -1,8 +1,9 @@
 import { call, type Operation } from "effection";
-import { type Package, usePackage } from "./use-package.tsx";
-import { PrivatePackageError } from "../errors.ts";
+import { PackageConfig, readPackageConfig } from "./use-package.tsx";
 
-export function* usePackages(): Operation<Package[]> {
+export function* readPackages(
+  { excludePrivate }: { excludePrivate: boolean },
+): Operation<PackageConfig[]> {
   const root = yield* call(async () => {
     try {
       const denoJson = await import("../../deno.json", {
@@ -16,17 +17,17 @@ export function* usePackages(): Operation<Package[]> {
 
   console.log(`Found ${JSON.stringify(root?.default.workspace)}`);
 
-  const workspaces: Package[] = [];
+  const configs: PackageConfig[] = [];
   for (let workspace of root?.default?.workspace ?? []) {
-    try {
-      const pkg = yield* usePackage(workspace);
-      workspaces.push(pkg);
-    } catch (e) {
-      if (!(e instanceof PrivatePackageError)) {
-        console.error(e);
+    const config = yield* readPackageConfig(workspace);
+    if (excludePrivate) {
+      if (!config.private) {
+        configs.push(config);
       }
+    } else {
+      configs.push(config);
     }
   }
 
-  return workspaces;
+  return configs;
 }

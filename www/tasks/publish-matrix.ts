@@ -1,16 +1,16 @@
 import { call, each, main } from "effection";
-import { usePackages } from "../hooks/use-packages.ts";
+import { readPackages } from "../hooks/read-packages.ts";
 import { DenoJson } from "../hooks/use-package.tsx";
 import { x } from "../../tinyexec/mod.ts";
 
 await main(function* () {
-  let packages = yield* usePackages();
+  let packages = yield* readPackages({ excludePrivate: true });
 
   let include: Record<string, unknown>[] = [];
 
   for (let pkgmeta of packages) {
     let mod = yield* call(() =>
-      import(`${pkgmeta.path}/deno.json`, { with: { type: "json" } })
+      import(`${pkgmeta.workspacePath}/deno.json`, { with: { type: "json" } })
     );
     let pkg = DenoJson.parse(mod.default);
 

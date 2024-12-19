@@ -11,6 +11,7 @@ import { rebasePlugin } from "effection-www/plugins/rebase.ts";
 import { assetsRoute } from "./routes/assets-route.ts";
 import { indexRoute } from "./routes/index.tsx";
 import { packageRoute } from "./routes/package.tsx";
+import { initJSRClient } from "./hooks/use-jsr-client.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -20,6 +21,15 @@ if (import.meta.main) {
     if (denoDeploy.isDenoDeploy) {
       patchDenoPermissionsQuerySync();
     }
+
+    const token = Deno.env.get("JSR_API") ?? "";
+    if (token === "") {
+      console.log("Missing JSR API token; expect score card not to load.");
+    }
+
+    yield* initJSRClient({
+      token,
+    });
 
     let revolution = createRevolution({
       app: [
