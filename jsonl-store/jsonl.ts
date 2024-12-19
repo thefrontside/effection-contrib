@@ -1,4 +1,5 @@
-import { JSONLinesParseStream } from "https://deno.land/x/jsonlines@v1.2.2/mod.ts";
+import { JsonParseStream } from "jsr:@std/json@1.0.1";
+import { TextLineStream } from "jsr:@std/streams@1.0.8";
 import { emptyDir, exists, walk } from "jsr:@std/fs@1.0.4";
 import {
   basename,
@@ -9,6 +10,7 @@ import {
 } from "jsr:@std/path@1.0.6";
 import {
   call,
+  createChannel,
   createQueue,
   each,
   type Operation,
@@ -47,9 +49,19 @@ export class JSONLStore implements Store {
    * @returns
    */
   static from(options: StoreConstructorOptions): JSONLStore {
-    return new JSONLStore(
-      toFileUrl(`${options.location}`.replace(/\/?$/, "/")),
-    );
+    const pathname = options.location instanceof URL
+      ? options.location.pathname
+      : options.location;
+
+    if (pathname.charAt(-1) === "/") {
+      return new JSONLStore(
+        toFileUrl(pathname),
+      );
+    } else {
+      return new JSONLStore(
+        toFileUrl(`${pathname}/`),
+      );
+    }
   }
 
   /**
@@ -101,14 +113,31 @@ export class JSONLStore implements Store {
     const location = new URL(`./${key}.jsonl`, this.location);
 
     return resource(function* (provide) {
+      const channel = createChannel<T, void>();
+
       const file = yield* call(() => Deno.open(location, { read: true }));
 
       const lines = file
         .readable
         .pipeThrough(new TextDecoderStream())
-        .pipeThrough(new JSONLinesParseStream());
+        .pipeThrough(new TextLineStream())
+        .pipeThrough(new JsonParseStream());
 
-      yield* provide(yield* stream(lines as ReadableStream<T>));
+      yield* spawn(function* () {
+        const reader = lines.getReader();
+        try {
+          while (true) {
+            const { done, value } = yield* call(() => reader.read());
+            yield* channel.send(value as T);
+            if (done) break;
+          }
+        } finally {
+          reader.releaseLock();
+          yield* channel.close();
+        }
+      });
+
+      yield* provide(yield* channel);
     });
   }
 

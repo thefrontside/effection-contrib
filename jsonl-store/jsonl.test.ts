@@ -37,9 +37,17 @@ describe("JSONLStore", () => {
     store = JSONLStore.from({ location: tmpDir });
   });
 
-  it("has from constructor that ensures trailing slash", () => {
-    const store = JSONLStore.from({ location: "/foo" });
-    expect(`${store.location}`).toEqual("file:///foo/");
+  describe("from", () => {
+    it("ensures trailing slash for string path", () => {
+      const store = JSONLStore.from({ location: "/foo" });
+      expect(`${store.location}`).toEqual("file:///foo/");
+    });
+    it("ensures trailing slash for URL", () => {
+      const store = JSONLStore.from({
+        location: new URL(".cache", "file:///usr/"),
+      });
+      expect(`${store.location}`).toEqual("file:///usr/.cache/");
+    });
   });
 
   it("writes to a file", async () => {
