@@ -34,7 +34,8 @@ await main(function* () {
         tagname,
         name: pkg.name,
         version: pkg.version,
-        npmVersionUnpublished: !(yield* isVersionPublished(pkg.name, pkg.version))
+        npmVersionUnpublished:
+          !(yield* isVersionPublished(pkg.name, pkg.version)),
       });
     }
   }

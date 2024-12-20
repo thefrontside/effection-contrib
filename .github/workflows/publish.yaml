@@ -45,7 +45,7 @@ jobs:
       - run: deno publish
         working-directory: ${{ matrix.workspace }}
   npm:
-    if: ${{ fromJSON(needs.generate-matrix.outputs.exists)}} 
+    if: ${{ fromJSON(needs.generate-matrix.outputs.exists)}}
     name: Publish ${{ matrix.name }}@${{matrix.version}} to NPM
     runs-on: ubuntu-latest
 
