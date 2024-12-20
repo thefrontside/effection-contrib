@@ -2,6 +2,7 @@ import { call, each, main } from "effection";
 import { readPackages } from "../hooks/read-packages.ts";
 import { DenoJson } from "../hooks/use-package.tsx";
 import { x } from "../../tinyexec/mod.ts";
+import { isVersionPublished } from "../hooks/use-npm-client.ts";
 
 await main(function* () {
   let packages = yield* readPackages({ excludePrivate: true });
@@ -33,6 +34,8 @@ await main(function* () {
         tagname,
         name: pkg.name,
         version: pkg.version,
+        npmVersionUnpublished:
+          !(yield* isVersionPublished(pkg.name, pkg.version)),
       });
     }
   }
