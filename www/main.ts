@@ -1,4 +1,4 @@
-import { main, suspend } from "effection";
+import { call, main, suspend } from "effection";
 import { createRevolution, ServerInfo } from "revolution";
 import { initDenoDeploy } from "../deno-deploy/mod.ts";
 
