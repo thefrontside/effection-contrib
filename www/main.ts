@@ -1,4 +1,3 @@
-import getPort from "npm:get-port@7.1.0";
 import { call, main, suspend } from "effection";
 import { createRevolution, ServerInfo } from "revolution";
 import { initDenoDeploy } from "../deno-deploy/mod.ts";
@@ -46,9 +45,7 @@ if (import.meta.main) {
       ],
     });
 
-    let server = yield* revolution.start({
-      port: yield* call(() => getPort({ port: 8000 })),
-    });
+    let server = yield* revolution.start();
     console.log(`www -> ${urlFromServer(server)}`);
 
     yield* suspend();
