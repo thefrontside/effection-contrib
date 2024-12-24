@@ -42,8 +42,9 @@ jobs:
       - uses: actions/checkout@v4.2.0
       - uses: denoland/setup-deno@v2
 
-      - run: deno publish
+      - run: deno publish --token=${{ secrets.JSR_TOKEN }}
         working-directory: ${{ matrix.workspace }}
+
   npm:
     if: fromJSON(needs.generate-matrix.outputs.exists)
     name: Publish ${{ matrix.name }}@${{matrix.version}} to NPM
