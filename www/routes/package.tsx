@@ -21,7 +21,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
       });
       for (let pkg of configs) {
         paths.push({
-          pathname: pathname({ workspace: pkg.workspace }),
+          pathname: pathname({ workspace: pkg.workspace.replace(/^\.\//, "") }),
         });
       }
       return paths;
