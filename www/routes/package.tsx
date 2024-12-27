@@ -35,7 +35,7 @@ export function packageRoute(): SitemapRoute<JSXElement> {
 
         const AppHTML = yield* useAppHtml({
           title: `${pkg.packageName}`,
-          description: `${pkg.MDXDescription()}`,
+          description: yield* pkg.MDXDescription(),
           pageTitle: `${pkg.packageName} | Effection Contrib`,
         });
 

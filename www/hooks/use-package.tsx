@@ -96,8 +96,8 @@ export interface Package {
    * Generated docs
    */
   docs: Record<string, Array<RenderableDocNode>>;
-  MDXContent: () => JSX.Element;
-  MDXDescription: () => JSX.Element;
+  MDXContent: () => Operation<JSX.Element>;
+  MDXDescription: () => Operation<string>;
 }
 
 export type RenderableDocNode = DocNode & {
@@ -123,7 +123,7 @@ export const DEFAULT_MODULE_KEY = ".";
 
 const PackageContext = createContext<Package>("package");
 
-export function* initPackageContext(config: PackageConfig) {
+export function* initPackageContext(config: PackageConfig): Operation<Package> {
   const pkg = yield* createPackage(config);
   return yield* PackageContext.set(pkg);
 }
@@ -137,9 +137,8 @@ export function* readPackageConfig(
 ): Operation<PackageConfig> {
   const workspacePath = resolve(Deno.cwd(), workspace);
 
-  const config: { private?: boolean } = yield* call(
-    async () =>
-      JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`)),
+  const config: { private?: boolean } = yield* call(async () =>
+    JSON.parse(await Deno.readTextFile(`${workspacePath}/deno.json`))
   );
 
   const readme = yield* call(async () => {
@@ -161,12 +160,6 @@ export function* readPackageConfig(
 }
 
 function* createPackage(config: PackageConfig) {
-  let mod = yield* useMDX(config.readme);
-
-  const content = mod.default({});
-
-  let file: VFile = yield* useDescriptionParse(config.readme);
-
   const exports = typeof config.exports === "string"
     ? {
       [DEFAULT_MODULE_KEY]: config.exports,
@@ -189,27 +182,29 @@ function* createPackage(config: PackageConfig) {
   let docs: Package["docs"] = {};
   for (const key of Object.keys(entrypoints)) {
     const docNodes = yield* useDenoDoc(String(entrypoints[key]));
-    docs[key] = yield* all(docNodes.map(function* (node) {
-      if (node.jsDoc && node.jsDoc.doc) {
-        try {
-          const mod = yield* useMDX(node.jsDoc.doc);
-          return {
-            id: exportHash(key, node),
-            ...node,
-            MDXDoc: () => mod.default({}),
-          };
-        } catch (e) {
-          console.error(
-            `Could not parse doc string for ${node.name} at ${node.location}`,
-            e,
-          );
+    docs[key] = yield* all(
+      docNodes.map(function* (node) {
+        if (node.jsDoc && node.jsDoc.doc) {
+          try {
+            const mod = yield* useMDX(node.jsDoc.doc);
+            return {
+              id: exportHash(key, node),
+              ...node,
+              MDXDoc: () => mod.default({}),
+            };
+          } catch (e) {
+            console.error(
+              `Could not parse doc string for ${node.name} at ${node.location}`,
+              e,
+            );
+          }
         }
-      }
-      return {
-        id: exportHash(key, node),
-        ...node,
-      };
-    }));
+        return {
+          id: exportHash(key, node),
+          ...node,
+        };
+      }),
+    );
   }
 
   return {
@@ -246,10 +241,12 @@ function* createPackage(config: PackageConfig) {
     readme: config.readme,
     docs,
     version: config.version,
-    *jsrPackageDetails(): Operation<[
-      z.SafeParseReturnType<unknown, PackageDetailsResult>,
-      z.SafeParseReturnType<unknown, PackageScoreResult>,
-    ]> {
+    *jsrPackageDetails(): Operation<
+      [
+        z.SafeParseReturnType<unknown, PackageDetailsResult>,
+        z.SafeParseReturnType<unknown, PackageScoreResult>,
+      ]
+    > {
       const client = yield* useJSRClient();
       const [details, score] = yield* all([
         client.getPackageDetails({ scope, package: name }),
@@ -272,8 +269,16 @@ function* createPackage(config: PackageConfig) {
 
       return [details, score];
     },
-    MDXContent: () => content,
-    MDXDescription: () => <>{file.data?.meta?.description}</>,
+    *MDXContent(): Operation<JSX.Element> {
+      let mod = yield* useMDX(config.readme);
+
+      return mod.default({});
+    },
+    *MDXDescription(): Operation<string> {
+      let file: VFile = yield* useDescriptionParse(config.readme);
+
+      return file.data?.meta?.description ? file.data?.meta?.description : "";
+    },
   };
 }
 

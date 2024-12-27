@@ -14,7 +14,7 @@ export function PackageIndexItem(props: PackageIndexItemProps) {
           <a href={`/${pkg.workspace}`}>{pkg.workspace}</a>
         </h3>
         <p>
-          <pkg.MDXDescription />
+          {yield* pkg.MDXDescription()}
         </p>
       </li>
     );

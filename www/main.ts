@@ -34,8 +34,8 @@ if (import.meta.main) {
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),
-        route("/assets(.*)", assetsRoute("assets")),
         route("/:workspace", packageRoute()),
+        route("/assets(.*)", assetsRoute("assets")),
       ],
       plugins: [
         twindPlugin({ config }),
