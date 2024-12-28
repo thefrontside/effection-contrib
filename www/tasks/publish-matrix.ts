@@ -1,20 +1,17 @@
 import { call, each, main } from "effection";
-import { readPackages } from "../hooks/read-packages.ts";
-import { DenoJson } from "../hooks/use-package.tsx";
 import { x } from "../../tinyexec/mod.ts";
+import { readPackages } from "../hooks/read-packages.ts";
 
 await main(function* () {
-  let packages = yield* readPackages({ excludePrivate: true });
+  let configs = yield* readPackages({
+    excludePrivate: true,
+    base: new URL(`file://${Deno.cwd()}`),
+  });
 
   let include: Record<string, unknown>[] = [];
 
-  for (let pkgmeta of packages) {
-    let mod = yield* call(() =>
-      import(`${pkgmeta.workspacePath}/deno.json`, { with: { type: "json" } })
-    );
-    let pkg = DenoJson.parse(mod.default);
-
-    let tagname = `${pkg.name.split("/")[1]}-v${pkg.version}`;
+  for (let pkg of configs) {
+    let tagname = `${pkg.denoJson.name.split("/")[1]}-v${pkg.denoJson.version}`;
 
     let git = yield* x(`git`, [`tag`, `--list`, tagname]);
 
@@ -29,10 +26,10 @@ await main(function* () {
     // ergo we publish
     if (output.join("").trim() === "") {
       include.push({
-        workspace: pkgmeta.workspace,
+        workspace: pkg.workspace,
         tagname,
-        name: pkg.name,
-        version: pkg.version,
+        name: pkg.denoJson.name,
+        version: pkg.denoJson.version,
       });
     }
   }

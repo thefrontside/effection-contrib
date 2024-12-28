@@ -4,6 +4,7 @@ import type { JSXElement } from "revolution";
 import { PackageIndexItem } from "../components/index/item.tsx";
 import { readPackages } from "../hooks/read-packages.ts";
 import { useAppHtml } from "./app.html.tsx";
+import { useRepository } from "../hooks/use-repository.ts";
 
 export function indexRoute(): SitemapRoute<JSXElement> {
   return {
@@ -20,7 +21,12 @@ export function indexRoute(): SitemapRoute<JSXElement> {
         pageTitle: "Contrib | Effection",
       });
 
-      let configs = yield* readPackages({ excludePrivate: true });
+      const repository = yield* useRepository();
+
+      let configs = yield* readPackages({
+        excludePrivate: true,
+        base: repository.location,
+      });
 
       return (
         <AppHTML>

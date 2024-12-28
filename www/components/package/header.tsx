@@ -13,7 +13,7 @@ export function PackageHeader() {
             <span>/</span>
             {pkg.name}
           </span>
-          <span class="text-3xl mx-2 align-middle">v{pkg.version}</span>
+          <span class="text-3xl mx-2 align-middle">v{pkg.version ? pkg.version : ""}</span>
           {yield* PackageSourceLink()()}
         </div>
         <div class="space-x-1">
