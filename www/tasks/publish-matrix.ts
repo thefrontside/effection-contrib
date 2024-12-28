@@ -5,7 +5,7 @@ import { readPackages } from "../hooks/read-packages.ts";
 await main(function* () {
   let configs = yield* readPackages({
     excludePrivate: true,
-    base: new URL(`file://${Deno.cwd()}`),
+    base: new URL(`file://${Deno.cwd()}/`),
   });
 
   let include: Record<string, unknown>[] = [];
