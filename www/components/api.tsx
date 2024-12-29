@@ -49,7 +49,7 @@ interface TypeProps {
   node: RenderableDocNode;
 }
 
-function* Type({ node }: TypeProps): Operation<JSXElement> {
+export function* Type({ node }: TypeProps): Operation<JSXElement> {
   switch (node.kind) {
     case "function":
       return (
