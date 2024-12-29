@@ -358,6 +358,8 @@ function TypeDef({ typeDef }: { typeDef: TsTypeDef }) {
           <Punctuation>]</Punctuation>
         </>
       );
+    case "tuple":
+      return (<span class="token">[]</span>)
     case "array":
       return (
         <>
@@ -417,11 +419,18 @@ function InterfaceTypeParams({
             return [
               <>
                 {param.name}
+                <Keyword>{" extends "}</Keyword>
                 {param.constraint
                   ? <TypeDef typeDef={param.constraint} />
                   : <></>}
+                {param.default ? (
+                  <>
+                    <Keyword>{" = "}</Keyword>
+                    <TypeDef typeDef={param.default} />
+                  </>
+                ): <></>}
               </>,
-              <>,</>,
+              ", ",
             ];
           })
           .slice(0, -1)}
