@@ -1,12 +1,11 @@
 import { all, call, createContext, type Operation, type Result, Ok, Err } from "effection";
-import { dirname, SEPARATOR } from "jsr:@std/path@1.0.6";
-import type { VFile } from "npm:vfile@6.0.3";
+import { SEPARATOR } from "jsr:@std/path@1.0.6";
 import { z } from "npm:zod@3.23.8";
 import type { JSXElement } from "revolution";
 
 import { type DocNode, useDenoDoc } from "./use-deno-doc.tsx";
 import { useMDX } from "./use-mdx.tsx";
-import { useDescriptionParse } from "./use-description-parse.tsx";
+import { useDescription } from "./use-description-parse.tsx";
 import {
   PackageDetailsResult,
   PackageScoreResult,
@@ -97,7 +96,7 @@ export interface Package {
    */
   docs: Record<string, Array<RenderableDocNode>>;
   MDXContent: () => Operation<JSX.Element>;
-  MDXDescription: () => Operation<string>;
+  description: () => Operation<string>;
 }
 
 export type RenderableDocNode = DocNode & {
@@ -294,10 +293,8 @@ export function* createPackage(config: PackageConfig) {
 
       return mod.default({});
     },
-    *MDXDescription(): Operation<string> {
-      let file: VFile = yield* useDescriptionParse(config.readme);
-
-      return file.data?.meta?.description ? file.data?.meta?.description : "";
+    *description(): Operation<string> {
+      return yield* useDescription(config.readme);
     },
   };
 }

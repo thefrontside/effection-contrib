@@ -10,7 +10,13 @@ import remarkParse from "npm:remark-parse@11.0.0";
 import remarkRehype from "npm:remark-rehype@11.1.1";
 import { trimAfterHR } from "../lib/trim-after-hr.ts";
 
-export function* useDescriptionParse(markdown: string): Operation<VFile> {
+export function* useDescription(markdown: string): Operation<string> {
+  const file = yield* useMarkdownFile(markdown);
+
+  return file.data?.meta?.description ?? "";
+}
+
+export function* useMarkdownFile(markdown: string): Operation<VFile> {
   return yield* call(() =>
     unified()
       .use(remarkParse)
