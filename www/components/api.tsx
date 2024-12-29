@@ -357,7 +357,7 @@ function TypeDef({ typeDef }: { typeDef: TsTypeDef }) {
         </>
       );
     case "tuple":
-      return (<span class="token">[]</span>)
+      return <span class="token">[]</span>;
     case "array":
       return (
         <>
@@ -421,12 +421,14 @@ function InterfaceTypeParams({
                 {param.constraint
                   ? <TypeDef typeDef={param.constraint} />
                   : <></>}
-                {param.default ? (
-                  <>
-                    <Keyword>{" = "}</Keyword>
-                    <TypeDef typeDef={param.default} />
-                  </>
-                ): <></>}
+                {param.default
+                  ? (
+                    <>
+                      <Keyword>{" = "}</Keyword>
+                      <TypeDef typeDef={param.default} />
+                    </>
+                  )
+                  : <></>}
               </>,
               ", ",
             ];

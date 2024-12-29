@@ -34,9 +34,9 @@ if (import.meta.main) {
 
     yield* initRepositoryContext({
       name: `thefrontside/effection-contrib`,
-      location: new URL('./../', import.meta.url),
-      defaultBranch: 'main'
-    })
+      location: new URL("./../", import.meta.url),
+      defaultBranch: "main",
+    });
 
     let revolution = createRevolution({
       app: [

@@ -37,7 +37,9 @@ export function packageRoute(): SitemapRoute<JSXElement> {
       const repository = yield* useRepository();
 
       try {
-        let config = yield* readPackageConfig(new URL(params.workspace, repository.location));
+        let config = yield* readPackageConfig(
+          new URL(params.workspace, repository.location),
+        );
         let pkg = yield* initPackageContext(config);
 
         const AppHTML = yield* useAppHtml({

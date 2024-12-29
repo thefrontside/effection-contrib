@@ -1,4 +1,12 @@
-import { all, call, createContext, type Operation, type Result, Ok, Err } from "effection";
+import {
+  all,
+  call,
+  createContext,
+  Err,
+  Ok,
+  type Operation,
+  type Result,
+} from "effection";
 import { SEPARATOR } from "jsr:@std/path@1.0.6";
 import { z } from "npm:zod@3.23.8";
 import type { JSXElement } from "revolution";
@@ -117,7 +125,7 @@ export type PackageConfig = {
   readme: string;
   workspace: string;
   workspacePath: URL;
-  denoJson: z.infer<typeof DenoJson>
+  denoJson: z.infer<typeof DenoJson>;
 };
 
 export const DEFAULT_MODULE_KEY = ".";
@@ -145,9 +153,11 @@ function* readTextFile(url: URL): Operation<Result<string>> {
   return yield* call(async () => {
     try {
       const result = await Deno.readTextFile(url);
-      return Ok(result)
+      return Ok(result);
     } catch (error) {
-      return Err<string>(error instanceof Error ? error : new Error(`${error}`))
+      return Err<string>(
+        error instanceof Error ? error : new Error(`${error}`),
+      );
     }
   });
 }
@@ -167,7 +177,7 @@ export function* readPackageConfig(
     )
   );
 
-  const readme = yield* readTextFile(new URL("./README.md", url))
+  const readme = yield* readTextFile(new URL("./README.md", url));
 
   const denoJson = DenoJson.parse(config);
 
