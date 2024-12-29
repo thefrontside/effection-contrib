@@ -2,7 +2,7 @@ import { call, type Operation } from "effection";
 import { PackageConfig, readPackageConfig } from "./use-package.tsx";
 
 export function* readPackages(
-  { excludePrivate }: { excludePrivate: boolean },
+  { excludePrivate, base }: { excludePrivate: boolean; base: URL },
 ): Operation<PackageConfig[]> {
   const root = yield* call(async () => {
     try {
@@ -15,13 +15,13 @@ export function* readPackages(
     }
   });
 
-  console.log(`Found ${JSON.stringify(root?.default.workspace)}`);
+  console.log(`Found ${root?.default.workspace.join(", ")}`);
 
   const configs: PackageConfig[] = [];
   for (let workspace of root?.default?.workspace ?? []) {
-    const config = yield* readPackageConfig(workspace);
+    const config = yield* readPackageConfig(new URL(workspace, base));
     if (excludePrivate) {
-      if (!config.private) {
+      if (!config.denoJson.private) {
         configs.push(config);
       }
     } else {

@@ -1,3 +1,4 @@
+// @ts-nocheck Node type is missing attributes
 import { EXIT, visit } from "npm:unist-util-visit@5.0.0";
 import type { Node } from "npm:@types/unist@3.0.3";
 

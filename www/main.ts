@@ -12,6 +12,7 @@ import { assetsRoute } from "./routes/assets-route.ts";
 import { indexRoute } from "./routes/index.tsx";
 import { packageRoute } from "./routes/package.tsx";
 import { initJSRClient } from "./hooks/use-jsr-client.ts";
+import { initRepositoryContext } from "./hooks/use-repository.ts";
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
 if (import.meta.main) {
@@ -31,11 +32,17 @@ if (import.meta.main) {
       token,
     });
 
+    yield* initRepositoryContext({
+      name: `thefrontside/effection-contrib`,
+      location: new URL("./../", import.meta.url),
+      defaultBranch: "main",
+    });
+
     let revolution = createRevolution({
       app: [
         route("/", indexRoute()),
-        route("/assets(.*)", assetsRoute("assets")),
         route("/:workspace", packageRoute()),
+        route("/assets(.*)", assetsRoute("assets")),
       ],
       plugins: [
         twindPlugin({ config }),
