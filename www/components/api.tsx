@@ -54,7 +54,7 @@ export function* Type({ node }: TypeProps): Operation<JSXElement> {
     case "function":
       return (
         <header>
-          <h3 class="inline-block" style="text-wrap: nowrap;">
+          <h3 class="inline-block">
             <span class="language-ts code-highlight">
               {node.functionDef.isAsync
                 ? <Punctuation>{"async "}</Punctuation>
@@ -75,8 +75,7 @@ export function* Type({ node }: TypeProps): Operation<JSXElement> {
     case "class":
       return (
         <header class="mb-10">
-          {/** TODO(taras): figure out why text-nowrap is missing **/}
-          <h3 class="inline-block mb-0" style="text-wrap: nowrap;">
+          <h3 class="inline-block mb-0">
             <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
             {node.classDef.extends
               ? (
@@ -100,7 +99,7 @@ export function* Type({ node }: TypeProps): Operation<JSXElement> {
                 </>
               )
               : <></>}
-            <Punctuation classes="text-lg" style="text-wrap: nowrap;">
+            <Punctuation classes="text-lg">
               {" {"}
             </Punctuation>
           </h3>
@@ -111,8 +110,7 @@ export function* Type({ node }: TypeProps): Operation<JSXElement> {
     case "interface":
       return (
         <header class="mb-10">
-          {/** TODO(taras): figure out why text-nowrap is missing **/}
-          <h3 class="inline-block mb-0" style="text-wrap: nowrap;">
+          <h3 class="inline-block mb-0">
             <Keyword>{node.kind}</Keyword> <ClassName>{node.name}</ClassName>
             {node.interfaceDef.typeParams.length > 0
               ? (
@@ -135,7 +133,7 @@ export function* Type({ node }: TypeProps): Operation<JSXElement> {
                 </>
               )
               : <></>}
-            <Punctuation classes="text-lg" style="text-wrap: nowrap;">
+            <Punctuation classes="text-lg">
               {" {"}
             </Punctuation>
           </h3>
