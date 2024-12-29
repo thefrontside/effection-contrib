@@ -101,6 +101,7 @@ export interface Package {
 
 export type RenderableDocNode = DocNode & {
   id: string;
+  description: string;
   MDXDoc?: () => JSXElement;
 };
 
@@ -208,6 +209,7 @@ export function* createPackage(config: PackageConfig) {
             return {
               id: exportHash(key, node),
               ...node,
+              description: yield* useDescription(node.jsDoc.doc),
               MDXDoc: () => mod.default({}),
             };
           } catch (e) {
@@ -219,6 +221,7 @@ export function* createPackage(config: PackageConfig) {
         }
         return {
           id: exportHash(key, node),
+          description: "",
           ...node,
         };
       }),
