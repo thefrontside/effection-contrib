@@ -210,9 +210,10 @@ export function* createPackage(config: PackageConfig) {
 
   let docs: Package["docs"] = {};
   for (const key of Object.keys(entrypoints)) {
-    const docNodes = yield* useDenoDoc(String(entrypoints[key]));
+    const url = String(entrypoints[key]);
+    const docNodes = yield* useDenoDoc([url]);
     docs[key] = yield* all(
-      docNodes.map(function* (node) {
+      docNodes[url].map(function* (node) {
         if (node.jsDoc && node.jsDoc.doc) {
           try {
             const mod = yield* useMDX(node.jsDoc.doc);
