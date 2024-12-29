@@ -25,7 +25,7 @@ export function* useMarkdownFile(markdown: string): Operation<VFile> {
       .use(trimAfterHR)
       .use(rehypeInferDescriptionMeta, {
         inferDescriptionHast: true,
-        truncateSize: 400,
+        truncateSize: 200,
       })
       .process(
         markdown,
