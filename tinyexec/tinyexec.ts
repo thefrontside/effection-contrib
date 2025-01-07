@@ -6,7 +6,7 @@ import {
   stream,
   useAbortSignal,
 } from "npm:effection@3.0.3";
-import { type KillSignal, type Options, type Output, x as $x } from "tinyexec";
+import { type KillSignal, type Options, type Output, x as $x } from "npm:tinyexec@0.3.2";
 
 export interface TinyProcess extends Operation<Output> {
   lines: Stream<string, void>;
