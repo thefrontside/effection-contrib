@@ -9,7 +9,6 @@ export function* request(
   return response;
 }
 
-// deno-lint-ignore no-explicit-any
-export function* json(response: Response): Operation<any> {
+export function* json(response: Response): Operation<unknown> {
   return yield* call(() => response.json());
 }
