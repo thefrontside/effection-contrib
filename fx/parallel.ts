@@ -61,7 +61,7 @@ export interface ParallelRet<T> extends Computation<Result<T>[]> {
  * }
  * ```
  */
-export function parallel<T>(operations: Callable<T>[]) {
+export function parallel<T>(operations: Callable<T>[]): Operation<ParallelRet<T>> {
   const sequence = createChannel<Result<T>>();
   const immediate = createChannel<Result<T>>();
   const results: Result<T>[] = [];
