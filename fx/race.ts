@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import type { Callable, Operation, Task } from "npm:effection@3.0.3";
 import { action, call, resource, spawn } from "npm:effection@3.0.3";
 
