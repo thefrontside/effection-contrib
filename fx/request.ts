@@ -10,6 +10,5 @@ export function* request(
 }
 
 export function* json(response: Response): Operation<unknown> {
-  const result = yield* call(response.json());
-  return result;
+  return yield* call(() => response.json());
 }
