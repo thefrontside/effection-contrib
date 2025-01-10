@@ -5,7 +5,7 @@ export function* request(
   opts?: RequestInit,
 ): Operation<Response> {
   const signal = yield* useAbortSignal();
-  const response = yield* call(fetch(url, { signal, ...opts }));
+  const response = yield* call(() => fetch(url, { signal, ...opts }));
   return response;
 }
 
