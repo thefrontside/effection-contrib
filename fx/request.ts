@@ -1,4 +1,4 @@
-import { call, useAbortSignal } from "effection";
+import { call, useAbortSignal } from "npm:effection@3.0.3";
 
 export function* request(url: string | URL | Request, opts?: RequestInit) {
   const signal = yield* useAbortSignal();
