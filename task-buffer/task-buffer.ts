@@ -8,7 +8,7 @@ import {
   type Task,
   useScope,
   withResolvers,
-} from "npm:effection@4.0.0-alpha.3";
+} from "npm:effection@4.0.0-alpha.4";
 
 /**
  * Spawn operations, but only allow a certain number to be active at a
