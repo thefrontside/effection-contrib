@@ -37,6 +37,7 @@
     "./task-buffer",
     "./tinyexec",
     "./timebox",
-    "./websocket"
+    "./websocket",
+    "./worker"
   ]
 }
