@@ -1,41 +1,54 @@
 # Web Worker
 
-Provides a resource for using a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) in Effection programs. The worker resource 
-automatically handles gracefully shutting down the Worker when the operation that created
-the worker goes out of scope. The worker resource provides a separate stream for `errors`, `messageerrors` and `messages`.
+A library for seamlessly integrating [Web Workers][web worker] with Effection programs.
+
+## Features
+
+* Automatic Worker lifecycle management
+* Graceful shutdown when operations go out of scope
+* Separate streams for errors, message errors, and messages
+* Type-safe message handling
+
+## Usage
+
+The `useWorker` function creates a Web Worker and returns a resource that manages its lifecycle:
 
 ```ts
 import { run } from "effection";
-import { useWorker } from "@effection-contrib/worker"
+import { useWorker } from "@effection-contrib/worker";
 
-await run(function*() {
-  const worker = yield* useWorker("./script.js");
+await run(function* () {
+  // Create and initialize the worker
+  const worker = yield* useWorker("./worker-script.js");
 
+  // Handle worker errors
   yield* spawn(function* () {
-    for (let event of yield* each(worker.errors)) {
-      // throw here will interrupt the program
+    for (const event of yield* each(worker.errors)) {
+      // Throwing here will interrupt the program
+      event.preventDefault();
       throw event.error;
-      // usually you'd have a `yield* each.next()` here
-      // but here would never happen because of the throw
     }
   });
 
+  // Handle worker messages
   yield* spawn(function* () {
-    for (let event of yield* each(worker.messages)) {
-      // do something with incoming message
+    for (const event of yield* each(worker.messages)) {
+      console.log("Received message:", event);
       yield* each.next();
     }
   });
 
   try {
-    // send a message into the worker
-    yield* worker.postMessage(options);
+    // Send messages to the worker
+    yield* worker.postMessage({ type: "process", data: "some data" });
   } finally {
-    // send a message into worker to tell is to close
-    // in case there some clean up that needs to happen inside 
-    // of the worker
-    yield* worker.postMessage({ type: "close", result: Ok() });
+    // Clean up: send close message to worker
+    yield* worker.postMessage({ 
+      type: "close", 
+      result: Ok() 
+    });
   }
 });
-
 ```
+
+[web worker]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
