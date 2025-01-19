@@ -30,7 +30,7 @@ export interface WorkerResource<TSend, TRecv> {
  * @param url {URL} or {string} of script
  * @param options {WorkerOptions}
  * @typeparam {TSend} messages that can be sent to worker
- * @typeparam {TRecv} messages taht can be received from worker
+ * @typeparam {TRecv} messages that can be received from worker
  * @returns {Operation<WorkerResource<TSend, TRecv>>}
  */
 export function useWorker<TSend, TRecv>(
