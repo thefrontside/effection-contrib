@@ -1,17 +1,19 @@
 # Web Worker
 
-A library for seamlessly integrating [Web Workers][web worker] with Effection programs.
+A library for seamlessly integrating [Web Workers][web worker] with Effection
+programs.
 
 ## Features
 
-* Automatic Worker lifecycle management
-* Graceful shutdown when operations go out of scope
-* Separate streams for errors, message errors, and messages
-* Type-safe message handling
+- Automatic Worker lifecycle management
+- Graceful shutdown when operations go out of scope
+- Separate streams for errors, message errors, and messages
+- Type-safe message handling
 
 ## Usage
 
-The `useWorker` function creates a Web Worker and returns a resource that manages its lifecycle:
+The `useWorker` function creates a Web Worker and returns a resource that
+manages its lifecycle:
 
 ```ts
 import { run } from "effection";
@@ -43,9 +45,9 @@ await run(function* () {
     yield* worker.postMessage({ type: "process", data: "some data" });
   } finally {
     // Clean up: send close message to worker
-    yield* worker.postMessage({ 
-      type: "close", 
-      result: Ok() 
+    yield* worker.postMessage({
+      type: "close",
+      result: Ok(),
     });
   }
 });

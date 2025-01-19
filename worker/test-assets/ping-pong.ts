@@ -1,13 +1,13 @@
 import { each, run, spawn, suspend } from "npm:effection@4.0.0-alpha.4";
 import { messages } from "../worker.ts";
 
-const incoming = messages<string>()
+const incoming = messages<string>();
 
-await run(function*() {
-  yield* spawn(function*() {
+await run(function* () {
+  yield* spawn(function* () {
     for (const message of yield* each(incoming)) {
       if (message === "ping") {
-        self.postMessage("pong")
+        self.postMessage("pong");
       } else if (message === "pong") {
         self.postMessage("ping");
       } else {
