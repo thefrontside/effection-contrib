@@ -1,10 +1,4 @@
-import {
-  type Operation,
-  run,
-  sleep,
-  spawn,
-  type Task,
-} from "npm:effection@4.0.0-alpha.4";
+import { run, sleep, spawn, type Task } from "npm:effection@4.0.0-alpha.4";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { useTaskBuffer } from "./task-buffer.ts";
@@ -17,9 +11,9 @@ describe("TaskBuffer", () => {
       yield* buffer.spawn(() => sleep(10));
       yield* buffer.spawn(() => sleep(10));
 
-      let third: Operation<Task<void>> | undefined;
+      let third: Task<void> | undefined;
       yield* spawn(function* () {
-        third = yield* buffer.spawn(() => sleep(10));
+        third = yield* yield* buffer.spawn(() => sleep(10));
       });
 
       yield* sleep(5);
