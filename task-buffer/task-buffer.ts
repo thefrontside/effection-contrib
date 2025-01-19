@@ -1,10 +1,13 @@
 import {
   createChannel,
+  Err,
+  Ok,
   type Operation,
   type Resolve,
   resource,
-  sleep,
+  type Result,
   spawn,
+  type Stream,
   type Task,
   useScope,
   withResolvers,
@@ -27,7 +30,7 @@ export interface TaskBuffer extends Operation<void> {
    * @param op - the operation to spawn in the buffer.
    * @returns the spawned task.
    */
-  spawn<T>(op: () => Operation<T>): Operation<Task<T>>;
+  spawn<T>(op: () => Operation<T>): Operation<Operation<Task<T>>>;
 }
 
 /**
@@ -56,57 +59,56 @@ export interface TaskBuffer extends Operation<void> {
  */
 export function useTaskBuffer(max: number): Operation<TaskBuffer> {
   return resource(function* (provide) {
-    let input = createChannel<SpawnRequest<unknown>, never>();
+    let input = createChannel<void, never>();
 
-    let output = createChannel<void, never>();
+    let output = createChannel<Result<unknown>, never>();
 
     let buffer = new Set<Task<unknown>>();
 
     let scope = yield* useScope();
 
-    let requests = yield* input;
+    let requests: SpawnRequest<unknown>[] = [];
 
     yield* spawn(function* () {
       while (true) {
-        if (buffer.size < max) {
-          const { value: request } = yield* requests.next();
+        if (requests.length === 0) {
+          yield* next(input);
+        } else if (buffer.size < max) {
+          let request = requests.pop()!;
           let task = yield* scope.spawn(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
             try {
-              yield* task;
-            } catch (_) {
-              // all we care about is that the task settled.
-            } finally {
+              let result = Ok(yield* task);
               buffer.delete(task);
-              yield* output.send();
+              yield* output.send(result);
+            } catch (error) {
+              buffer.delete(task);
+              yield* output.send(Err(error as Error));
             }
           });
           request.resolve(task);
         } else {
-          yield* (yield* output).next();
+          yield* next(output);
         }
       }
     });
 
     yield* provide({
       *[Symbol.iterator]() {
-        while (buffer.size > 0) {
-          for (let task of buffer.values()) {
-            yield* task;
-          }
-          yield* sleep(0);
+        let outputs = yield* output;
+        while (buffer.size > 0 || requests.length > 0) {
+          yield* outputs.next();
         }
       },
-      *spawn<T>(operation: () => Operation<T>) {
-        let spawned = withResolvers<Task<T>>();
-
-        yield* input.send({
-          operation,
-          resolve: spawned.resolve as Resolve<Task<unknown>>,
+      *spawn<T>(fn: () => Operation<T>) {
+        let { operation, resolve } = withResolvers<Task<T>>();
+        requests.unshift({
+          operation: fn,
+          resolve: resolve as Resolve<unknown>,
         });
-
-        return yield* spawned.operation;
+        yield* input.send();
+        return operation;
       },
     });
   });
@@ -115,4 +117,11 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
 interface SpawnRequest<T> {
   operation(): Operation<T>;
   resolve: Resolve<Task<T>>;
+}
+
+function* next<T, TClose>(
+  stream: Stream<T, TClose>,
+): Operation<IteratorResult<T, TClose>> {
+  let subscription = yield* stream;
+  return yield* subscription.next();
 }
