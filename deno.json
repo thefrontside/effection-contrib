@@ -39,6 +39,7 @@
     "./fx",
     "./task-buffer",
     "./tinyexec",
+    "./timebox",
     "./websocket"
   ],
   "deploy": {
