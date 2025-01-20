@@ -35,15 +35,16 @@ Deno.test("worker", async () => {
     assertStrictEquals(lastMessage, undefined);
 
     yield* worker.postMessage("ping");
+
     // todo(taras): find a way to do this without explicit sleep
-    yield* sleep(10);
+    yield* sleep(1);
 
     assertStrictEquals(lastError, undefined);
 
     assertStrictEquals(lastMessage, "pong");
 
     yield* worker.postMessage("pong");
-    yield* sleep(10);
+    yield* sleep(1);
 
     assertStrictEquals(lastError, undefined);
 
@@ -51,7 +52,7 @@ Deno.test("worker", async () => {
 
     yield* worker.postMessage("boo");
 
-    yield* sleep(10);
+    yield* sleep(2);
 
     assert(typeof lastError === "string", "lastError is defined");
 

@@ -2,6 +2,7 @@ import {
   createQueue,
   each,
   on,
+  once,
   type Operation,
   resource,
   spawn,
@@ -39,6 +40,9 @@ export function useWorker<TSend, TRecv>(
 ): Operation<WorkerResource<TSend, TRecv>> {
   return resource(function* (provide) {
     let worker = new Worker(url, options);
+
+    yield* once(worker, "message");
+    
     try {
       yield* provide({
         errors: on(worker, "error"),

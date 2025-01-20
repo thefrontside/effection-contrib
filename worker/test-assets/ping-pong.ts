@@ -17,5 +17,7 @@ await run(function* () {
     }
   });
 
+  self.postMessage("ready");
+
   yield* suspend();
 });
