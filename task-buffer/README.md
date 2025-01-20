@@ -5,10 +5,9 @@ active operations.
 
 ---
 
-When this limit is reached, the `TaskBuffer` automatically
-queues additional spawn requests and processes them in order as capacity becomes
-available. This prevents resource overload while ensuring all tasks are
-eventually executed.
+When this limit is reached, the `TaskBuffer` automatically queues additional
+spawn requests and processes them in order as capacity becomes available. This
+prevents resource overload while ensuring all tasks are eventually executed.
 
 ```ts
 import { run, sleep } from "effection";

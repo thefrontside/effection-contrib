@@ -1,7 +1,7 @@
 # WebSocket
 
-A streamlined [WebSocket][websocket] client for Effection programs that transforms the
-event-based WebSocket API into a clean, resource-oriented stream.
+A streamlined [WebSocket][websocket] client for Effection programs that
+transforms the event-based WebSocket API into a clean, resource-oriented stream.
 
 ## Why Use this API?
 

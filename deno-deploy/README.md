@@ -9,10 +9,10 @@ import { main } from "effection";
 import { useDenoDeploy } from "@effection-contrib/deno-deploy";
 
 await main(function* () {
-  const { 
-  isDenoDeploy,
-  deploymentId,
-  region 
+  const {
+    isDenoDeploy,
+    deploymentId,
+    region,
   } = yield* useDenoDeploy();
-})
+});
 ```
