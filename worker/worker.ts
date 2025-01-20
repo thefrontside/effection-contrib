@@ -1,19 +1,83 @@
+import { assert } from "https://deno.land/std@0.158.0/testing/asserts.ts";
 import {
   createQueue,
+  createSignal,
   each,
+  main,
   on,
   once,
   type Operation,
   resource,
+  scoped,
   spawn,
   type Stream,
 } from "npm:effection@4.0.0-alpha.4";
 
-export interface WorkerResource<TSend, TRecv> {
-  errors: Stream<ErrorEvent, never>;
-  messageerrors: Stream<MessageEvent, never>;
-  messages: Stream<MessageEvent<TRecv>, never>;
-  postMessage(message: TSend): Operation<void>;
+export interface WorkerResource<TSend, TRecv, TReturn, TData = unknown>
+  extends Operation<TReturn> {
+  send(data: TSend): Operation<TRecv>;
+}
+
+export interface WorkerMessages<TSend, TRecv> {
+  forEach(fn: (message: TSend) => Operation<TRecv>): Operation<void>;
+}
+
+export interface WorkerMainOptions<TSend, TRecv, TData> {
+  messages: WorkerMessages<TSend, TRecv>;
+  data: TData;
+}
+
+export type WorkerControl<TSend, TData> = {
+  type: "init";
+  data: TData;
+} | {
+  type: "send";
+  value: TSend;
+  response: MessagePort;
+};
+
+export async function workerMain<TSend, TRecv, TReturn, TData>(
+  body: (options: WorkerMainOptions<TSend, TRecv, TData>) => Operation<TReturn>,
+): Promise<void> {
+  await main(function* () {
+    try {
+      yield* scoped(function* () {
+        let sent = createSignal<{ value: TSend; response: MessagePort }>();
+        let subscription = yield* on(self, "message");
+
+        self.postMessage({ type: "open" });
+
+        let next = yield* subscription.next();
+        while (true) {
+          let control: WorkerControl<TSend, TData> = next.value.data;
+          if (control.type === "init") {
+            yield* spawn(function* () {
+              yield* body({
+                data: control.data,
+                messages: {
+                  *forEach(fn: (value: TSend) => Operation<TRecv>) {
+                    for (let { value, response } of yield* each(sent)) {
+                      yield* scoped(function* () {
+                        let result = yield* fn(value);
+                        response.postMessage(result);
+                      });
+                      yield* each.next();
+                    }
+                  },
+                },
+              });
+            });
+          } else if (control.type === "send") {
+            let { value, response } = control;
+            sent.send({ value, response });
+          }
+          next = yield* subscription.next();
+        }
+      });
+    } catch (error) {
+      //todo propagate errors upwards.
+    }
+  });
 }
 
 /**
@@ -34,22 +98,36 @@ export interface WorkerResource<TSend, TRecv> {
  * @typeparam {TRecv} messages that can be received from worker
  * @returns {Operation<WorkerResource<TSend, TRecv>>}
  */
-export function useWorker<TSend, TRecv>(
+export function useWorker<TSend, TRecv, TData>(
   url: string | URL,
-  options?: WorkerOptions,
-): Operation<WorkerResource<TSend, TRecv>> {
+  options?: WorkerOptions & { data?: TData },
+): Operation<WorkerResource<TSend, TRecv, TData>> {
   return resource(function* (provide) {
     let worker = new Worker(url, options);
 
-    yield* once(worker, "message");
+    let subscription = yield* on(worker, "message");
+
+    let first = yield* subscription.next();
+
+    assert(first.value.data.type === "open", `expected first message to arrive from worker to be of type "open", but was: ${first.value.data.type}`);
     
     try {
+      worker.postMessage({ type: "init", data: options?.data });
+
       yield* provide({
-        errors: on(worker, "error"),
-        messageerrors: on(worker, "messageerror"),
-        messages: on(worker, "message"),
-        *postMessage(value) {
-          worker.postMessage(value);
+        *send(value) {
+          let channel = yield* useMessageChannel();
+          worker.postMessage({
+            type: "send",
+            value,
+            response: channel.port2,
+          }, [channel.port2]);
+	  channel.port1.start();
+          let event = yield* once(channel.port1, "message");
+          return event.data;
+        },
+        *[Symbol.iterator]() {
+          throw new Error("not implemented yet");
         },
       });
     } finally {
@@ -58,45 +136,14 @@ export function useWorker<TSend, TRecv>(
   });
 }
 
-/**
- * Use inside of the worker thread to receive messages from the main thread.
- *
- * ```ts
- * import { run, each, suspend } from "effection";
- *
- * type IncomingMessages = { type: "close" } | { type: "value", value: unknown };
- *
- * const incoming = messages<IncomingMessages>();
- *
- * await run(function*() {
- *    yield* spawn(function*() {
- *      for (const message of yield* each(incoming)) {
- *        if (message.type === "close") {
- *          throw new Error("closed");
- *        }
- *        console.log(message.value);
- *        yield* each.next();
- *      }
- *    });
- *
- *    yield* suspend();
- * });
- * ```
- *
- * @typeparam {T} messages sent to worker
- * @returns {Stream<T, never>}
- */
-export function messages<T>(): Stream<T, never> {
-  return resource(function* (provide) {
-    let queue = createQueue<T, never>();
-
-    yield* spawn(function* () {
-      for (let event of yield* each(on(self, "message"))) {
-        queue.add(event.data);
-        yield* each.next();
-      }
-    });
-
-    yield* provide(queue);
-  });
+function useMessageChannel(): Operation<MessageChannel> {
+  return resource(function*(provide) {
+    let channel = new MessageChannel();
+    try {
+      yield* provide(channel)
+    } finally {
+      channel.port1.close();
+      channel.port2.close();
+    }
+  })
 }

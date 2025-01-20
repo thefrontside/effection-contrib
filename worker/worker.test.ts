@@ -1,63 +1,27 @@
-import {
-  assert,
-  assertStrictEquals,
-  assertStringIncludes,
-} from "jsr:@std/assert@1";
-import { each, run, sleep, spawn } from "npm:effection@4.0.0-alpha.4";
+import { describe, it } from "bdd";
+import { expect } from "expect";
+import { run } from "npm:effection@4.0.0-alpha.4";
 
 import { useWorker } from "./worker.ts";
 
-Deno.test("worker", async () => {
-  await run(function* () {
-    let lastMessage: string | undefined;
-    let lastError: string | undefined;
+describe("worker", () => {
+  it("sends and receive messages in synchrony", async () => {
+    await run(function* () {
+      let worker = yield* useWorker(
+        import.meta.resolve("./test-assets/echo-worker.ts"),
+	{ type: "module"}
+      );
 
-    let worker = yield* useWorker<string, string>(
-      new URL("./test-assets/ping-pong.ts", import.meta.url),
-      { type: "module", name: "ping-pong" },
-    );
-
-    yield* spawn(function* () {
-      for (const message of yield* each(worker.messages)) {
-        lastMessage = message.data;
-        yield* each.next();
-      }
+      let result = yield* worker.send("hello world");
+      expect(result).toEqual("hello world")
     });
-
-    yield* spawn(function* () {
-      for (const error of yield* each(worker.errors)) {
-        error.preventDefault();
-        lastError = error.message;
-        yield* each.next();
-      }
-    });
-
-    assertStrictEquals(lastMessage, undefined);
-
-    yield* worker.postMessage("ping");
-
-    // todo(taras): find a way to do this without explicit sleep
-    yield* sleep(1);
-
-    assertStrictEquals(lastError, undefined);
-
-    assertStrictEquals(lastMessage, "pong");
-
-    yield* worker.postMessage("pong");
-    yield* sleep(1);
-
-    assertStrictEquals(lastError, undefined);
-
-    assertStrictEquals(lastMessage, "ping");
-
-    yield* worker.postMessage("boo");
-
-    yield* sleep(2);
-
-    assert(typeof lastError === "string", "lastError is defined");
-
-    assertStringIncludes(lastError, "boo is neither ping nor pong");
-
-    assertStrictEquals(lastMessage, "ping");
   });
+  it("will raise an exception if an exception happens on the remote side", async () => {});
+  it("produces its return value", async () => {});
+  it("raises an exception if the worker raises one", async () => {});
+  it("crashes if there is an uncaught error", async () => {});
+  it("crashes if there is a message error from the main thread", async () => {});
+  it("crashes if there is a messag error from the worker thread", async () => {});
+  it("shuts down gratefully", async () => {});
+  it("passes arguments to the workerMain() function of the worker", async () => {});
 });
