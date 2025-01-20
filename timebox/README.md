@@ -1,4 +1,4 @@
-# @effection-contrib/timebox
+# Timebox
 
 Constrain any operation to complete within a certain time.
 
