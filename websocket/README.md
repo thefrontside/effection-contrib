@@ -1,26 +1,34 @@
 # WebSocket
 
-Use the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-API as an Effection resource. Instead of a fragile, spring-loaded confederation
-of 'open', 'close', 'error', and 'message' event handlers, `useWebSocket()`
-organizes them for you so that you can consume all events from the server as a
-plain stream that has state-readiness and proper error handling baked in.
+A streamlined [WebSocket][websocket] client for Effection programs that
+transforms the event-based WebSocket API into a clean, resource-oriented stream.
 
----
+## Why Use this API?
 
-To use a websocket import the `useWebSocket()` operation which behaves just like
-the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-constructor.
+Traditional WebSocket API require managing multiple event handlers (`open`,
+`close`, `error`, `message`) which can become complex and error-prone.
 
-```ts
+This package simplifies WebSocket usage by:
+
+- Providing a clean stream-based interface
+- Handling connection state management automatically
+- Implementing proper error handling
+- Ensuring resource cleanup
+
+## Basic Usage
+
+```typescript
 import { each, main } from "effection";
 import { useWebSocket } from "@effection-contrib/websocket";
 
 await main(function* () {
+  // Connection is guaranteed to be open when this returns
   let socket = yield* useWebSocket("ws://websocket.example.org");
 
+  // Send messages to the server
   socket.send("Hello World");
 
+  // Receive messages using a simple iterator
   for (let message of yield* each(socket)) {
     console.log("Message from server", message);
     yield* each.next();
@@ -28,20 +36,27 @@ await main(function* () {
 });
 ```
 
-The resource provides the following niceties:
+## Features
 
-- When `useWebSocket()` returns, it will have already received the `open` event.
-- If the socket recieves an error event, that event's error will be thrown to
-  the current error boundary.
-- The socket is a stream whose items are each `MessageEvents`, the `CloseEvent`
-  of the websocket will be the close event of that stream.
+- **Ready-to-use Connections**: `useWebSocket()` returns only after the
+  connection is established
+- **Automatic Error Handling**: Socket errors are properly propagated to your
+  error boundary
+- **Stream-based API**: Messages are delivered through a simple stream interface
+- **Clean Resource Management**: Connections are properly cleaned up when the
+  operation completes
 
-You can also instantiate a websocket separately and pass it along to
-`useWebSocket()`. This is helpful for runtimes such as NodeJS prior to version
-21 that do not have built in support for websocket.
+## Advanced Usage
 
-```ts
+### Custom WebSocket Implementations
+
+For environments without native WebSocket support (like Node.js < 21), you can
+provide your own WebSocket implementation:
+
+```typescript
 import { createWebSocket } from "my-websocket-client";
+import { each, main } from "effection";
+import { useWebSocket } from "@effection-contrib/websocket";
 
 await main(function* () {
   let socket = yield* useWebSocket(() =>
@@ -54,3 +69,5 @@ await main(function* () {
   }
 });
 ```
+
+[websocket]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket

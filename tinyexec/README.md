@@ -3,6 +3,8 @@
 Effection compatible wrapper around
 [tinyexec](https://www.npmjs.com/package/tinyexec) package.
 
+---
+
 To run a process, use the `x` function:
 
 ```ts
