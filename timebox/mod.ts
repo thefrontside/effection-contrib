@@ -12,7 +12,7 @@ export type Timeboxed<T> = Completed<T> | Timeout;
  */
 export interface Completed<T> {
   /**
-   * false: indicates that there was no timeout and that `value` was successfully computed
+   * false: indicates that there was no timeout and that value was successfully computed
    */
   readonly timeout: false;
 
@@ -27,7 +27,7 @@ export interface Completed<T> {
   readonly start: DOMHighResTimeStamp;
 
   /**
-   * The time that the operation succesfully returned {value}
+   * The time that the operation succesfully returned value
    */
   readonly end: DOMHighResTimeStamp;
 }
@@ -47,7 +47,7 @@ export interface Timeout {
   readonly start: DOMHighResTimeStamp;
 
   /**
-   * The time that the operation succesfully returned {value}
+   * The time that the operation succesfully returned value
    */
   readonly end: DOMHighResTimeStamp;
 }
