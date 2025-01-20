@@ -1,7 +1,11 @@
 # Task Buffer
 
 Manages concurrent task execution by enforcing a maximum limit on simultaneously
-active operations. When this limit is reached, the `TaskBuffer` automatically
+active operations.
+
+---
+
+When this limit is reached, the `TaskBuffer` automatically
 queues additional spawn requests and processes them in order as capacity becomes
 available. This prevents resource overload while ensuring all tasks are
 eventually executed.
