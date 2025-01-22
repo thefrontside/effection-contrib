@@ -1,8 +1,20 @@
 import { describe, it } from "bdd";
 import { expect } from "expect";
-import { run } from "npm:effection@4.0.0-alpha.4";
+import { emptyDir, exists } from "jsr:@std/fs";
+import { join } from "jsr:@std/path@^1.0.7";
+import { timebox } from "jsr:@effection-contrib/timebox@^0.1.0";
+import {
+  call,
+  run,
+  scoped,
+  sleep,
+  spawn,
+  suspend,
+} from "npm:effection@4.0.0-alpha.4";
 
 import { useWorker } from "./worker.ts";
+import { assert } from "https://deno.land/std@0.158.0/testing/asserts.ts";
+import type { ShutdownWorkerParams } from "./test-assets/shutdown-worker.ts";
 
 describe("worker", () => {
   it("sends and receive messages in synchrony", async () => {
@@ -50,10 +62,51 @@ describe("worker", () => {
     });
     await expect(task).rejects.toMatchObject({ message: "boom!" });
   });
-  it.skip("shuts down gratefully", async () => {
+  it("shuts down gracefully", async () => {
+    let dir = new URL(import.meta.resolve("./test-tmp")).pathname;
+    await emptyDir(dir);
+    let startFile = join(dir, "started.txt");
+    let endFile = join(dir, "ended.txt");
+    let url = import.meta.resolve("./test-assets/shutdown-worker.ts");
+    await run(function* () {
+      let task = yield* spawn(function* () {
+        yield* useWorker(url, {
+          type: "module",
+          data: {
+            startFile,
+            endFile,
+            endText: "goodbye cruel world!",
+          } satisfies ShutdownWorkerParams,
+        });
+        yield* suspend();
+      });
+
+      let started = yield* timebox(10_000, function* () {
+        while (true) {
+          yield* sleep(1);
+          if (yield* call(() => exists(startFile))) {
+            break;
+          }
+        }
+      });
+
+      assert(!started.timeout, "worker did not start after 10s");
+      yield* task.halt();
+    });
+
+    expect(await exists(endFile)).toEqual(true);
+    expect(await Deno.readTextFile(endFile)).toEqual("goodbye cruel world!");
   });
 
-  it.skip("becomes halted if you try and await its value out of scope", () => {
+  it("becomes halted if you try and await its value out of scope", async () => {
+    let url = import.meta.resolve("./test-assets/suspend-worker.ts");
+    let task = run(function* () {
+      let worker = yield* scoped(function* () {
+        return yield* useWorker(url, { type: "module" });
+      });
+      yield* worker;
+    });
+    await expect(task).rejects.toMatchObject({ message: "worker terminated" });
   });
 
   it.skip("crashes if there is an uncaught error in the worker", async () => {
