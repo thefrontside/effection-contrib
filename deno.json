@@ -1,7 +1,4 @@
 {
-  "tasks": {
-    "dev": "deno run  -A --watch www/main.ts"
-  },
   "imports": {
     "effection": "npm:effection@3.0.3",
     "effection-www/": "https://raw.githubusercontent.com/thefrontside/effection/4982887c1677b847d256402e8709f2b1d49437e6/www/",
@@ -41,15 +38,5 @@
     "./tinyexec",
     "./timebox",
     "./websocket"
-  ],
-  "deploy": {
-    "project": "aa1dbfaa-d7c1-49d7-b514-69e1d8344f95",
-    "exclude": [
-      "**/node_modules"
-    ],
-    "include": [
-      "."
-    ],
-    "entrypoint": "www/main.ts"
-  }
+  ]
 }
