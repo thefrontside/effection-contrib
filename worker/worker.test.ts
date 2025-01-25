@@ -29,6 +29,7 @@ describe("worker", () => {
     });
   });
   it("will raise an exception if an exception happens on the remote side", async () => {
+    expect.assertions(1);
     let task = run(function* () {
       let worker = yield* useWorker<void, unknown, unknown, unknown>(
         import.meta.resolve("./test-assets/boom-worker.ts"),
@@ -51,6 +52,7 @@ describe("worker", () => {
     });
   });
   it("raises an exception if the worker raises one", async () => {
+    expect.assertions(1);
     let task = run(function* () {
       let worker = yield* useWorker(
         import.meta.resolve("./test-assets/boom-result-worker.ts"),
@@ -107,6 +109,21 @@ describe("worker", () => {
       yield* worker;
     });
     await expect(task).rejects.toMatchObject({ message: "worker terminated" });
+  });
+
+  it("supports stateful operations", async () => {
+    let url = import.meta.resolve("./test-assets/counter-worker.ts");
+    expect.assertions(3);
+
+    await run(function* () {
+      let worker = yield* useWorker(url, { type: "module", data: 2 });
+
+      expect(yield* worker.send(10)).toEqual(12);
+
+      expect(yield* worker.send(-5)).toEqual(7);
+
+      expect(yield* worker.send(35)).toEqual(42);
+    });
   });
 
   it.skip("crashes if there is an uncaught error in the worker", async () => {
