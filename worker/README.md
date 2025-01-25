@@ -146,4 +146,27 @@ try {
 }
 ```
 
+## Closing the worker
+
+We generally recommend to rely on implicit termination using lexical scope, but
+if you need to explicitely close the worker, you can use the `halt()` operation
+on the worker.
+
+```ts
+import { run } from "effection";
+import { useWorker } from "@effection-contrib/worker";
+
+await run(function* () {
+  const worker = yield* useWorker<number, number, number, number>(
+    "./counter-worker.ts",
+    {
+      type: "module",
+      data: 5, // initial value used by the stateful worker (can be any serializable value)
+    },
+  );
+
+  yield* worker.halt();
+});
+```
+
 [web worker]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers

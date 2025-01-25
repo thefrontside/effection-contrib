@@ -24,22 +24,55 @@ export interface WorkerMessages<TSend, TRecv> {
   forEach(fn: (message: TSend) => Operation<TRecv>): Operation<void>;
 }
 
+/**
+ * Argument recieved by workerMain function
+ *
+ * @template TSend - type of value main thread will send to the worker
+ * @template TRecv - type of value main thread will receive from the worker
+ * @template TData - type of data passed from the main thread to the worker during initialization
+ */
 export interface WorkerMainOptions<TSend, TRecv, TData> {
+  /**
+   * Namespace that provides APIs for working with incoming messages
+   */
   messages: WorkerMessages<TSend, TRecv>;
+  /**
+   * Initial data received by the worker from the main thread used for initialization.
+   */
   data: TData;
 }
 
-export type WorkerControl<TSend, TData> = {
-  type: "init";
-  data: TData;
-} | {
-  type: "send";
-  value: TSend;
-  response: MessagePort;
-} | {
-  type: "close";
-};
-
+/**
+ * Use this function in the worker to wrap the operation function that
+ * will perform the calculation. Used for both stateless and stateful workers.
+ *
+ * @example Stateless worker
+ * ```ts
+ * import { workerMain } from "../worker.ts";
+ *
+ * await workerMain(function* ({ data }) {
+ *  return data;
+ * });
+ * ```
+ *
+ * @example Stateful worker
+ * ```ts
+ * import { workerMain } from "../worker.ts";
+ *
+ * await workerMain(function* ({ messages }) {
+ *  yield* messages.forEach(function* (message) {
+ *    return message;
+ *  });
+ * });
+ * ```
+ *
+ * @template TSend - type of value main thread will send to the worker
+ * @template TRecv - type of value main thread will receive from the worker
+ * @template TReturn - type of worker operation return value
+ * @template TData - type of data passed from the main thread to the worker during initialization
+ * @param {(options: WorkerMainOptions<TSend, TRecv, TData>) => Operation<TReturn>} body
+ * @returns {Promise<void>}
+ */
 export async function workerMain<TSend, TRecv, TReturn, TData>(
   body: (options: WorkerMainOptions<TSend, TRecv, TData>) => Operation<TReturn>,
 ): Promise<void> {
@@ -99,21 +132,46 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
 }
 
 /**
- * Use on the main thread to create a well behaved web worker.
+ * Use on the main thread to create and exeecute a well behaved web worker.
  *
+ * @example Stateless worker
  * ```ts
  * import { run } from "effection";
  * import { useWorker } from "@effection-contrib/worker"
  *
  * await run(function*() {
- *    const worker = yield* useWorker("script.js", { type: "module" })
+ *    const worker = yield* useWorker("script.ts", { type: "module" });
+ *
+ *    try {
+ *      const result = yield* worker;
+ *    } catch (e) {
+ *      console.error(e);
+ *    }
+ * });
+ * ```
+ *
+ * @exampel Stateful worker
+ * ```ts
+ * import { run } from "effection";
+ * import { useWorker } from "@effection-contrib/worker"
+ *
+ * await run(function*() {
+ *    const worker = yield* useWorker("script.ts", { type: "module" });
+ *
+ *    try {
+ *      const result = yield* worker.send("hello world");
+ *    } catch (e) {
+ *      console.error(e);
+ *    }
  * });
  * ```
  *
  * @param url {URL} or {string} of script
  * @param options {WorkerOptions}
- * @typeparam {TSend} messages that can be sent to worker
- * @typeparam {TRecv} messages that can be received from worker
+ * @template TSend - type of value main thread will send to the worker
+ * @template TRecv - type of value main thread will receive from the worker
+ * @template TReturn - type of worker operation return value
+ * @template TData - type of data passed from the main thread to the worker during initialization
  * @returns {Operation<WorkerResource<TSend, TRecv>>}
  */
 export function useWorker<TSend, TRecv, TReturn, TData>(
@@ -184,6 +242,17 @@ export function useWorker<TSend, TRecv, TReturn, TData>(
     }
   });
 }
+
+type WorkerControl<TSend, TData> = {
+  type: "init";
+  data: TData;
+} | {
+  type: "send";
+  value: TSend;
+  response: MessagePort;
+} | {
+  type: "close";
+};
 
 function useMessageChannel(): Operation<MessageChannel> {
   return resource(function* (provide) {
