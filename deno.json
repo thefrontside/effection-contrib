@@ -1,7 +1,6 @@
 {
   "imports": {
     "effection": "npm:effection@3.0.3",
-    "effection-www/": "https://raw.githubusercontent.com/thefrontside/effection/4982887c1677b847d256402e8709f2b1d49437e6/www/",
     "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
     "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts",
     "bdd": "jsr:@std/testing/bdd",
@@ -15,12 +14,6 @@
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "revolution"
-  },
-  "scopes": {
-    "https://raw.githubusercontent.com/thefrontside/effection/4982887c1677b847d256402e8709f2b1d49437e6/www/": {
-      "revolution": "https://deno.land/x/revolution@0.6.0/mod.ts",
-      "revolution/jsx-runtime": "https://deno.land/x/revolution@0.6.0/jsx-runtime.ts"
-    }
   },
   "lint": {
     "rules": {
