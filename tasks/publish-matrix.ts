@@ -1,19 +1,26 @@
-import { call, each, main } from "effection";
-import { readPackages } from "../hooks/read-packages.ts";
-import { DenoJson } from "../hooks/use-package.tsx";
-import { x } from "../../tinyexec/mod.ts";
+import { call, each, main, type Operation } from "effection";
+import { x } from "../tinyexec/mod.ts";
+import { z } from "npm:zod@3.23.8";
+import { resolve } from "jsr:@std/path@^1.0.6";
+
+const DenoJson = z.object({
+  name: z.string(),
+  version: z.string(),
+  exports: z.union([z.record(z.string()), z.string()]),
+  license: z.string(),
+});
+
+type PackageConfig = {
+  workspace: string;
+  workspacePath: string;
+} & z.infer<typeof DenoJson>;
 
 await main(function* () {
-  let packages = yield* readPackages({ excludePrivate: true });
+  let packages = yield* readPackages();
 
   let include: Record<string, unknown>[] = [];
 
-  for (let pkgmeta of packages) {
-    let mod = yield* call(() =>
-      import(`${pkgmeta.workspacePath}/deno.json`, { with: { type: "json" } })
-    );
-    let pkg = DenoJson.parse(mod.default);
-
+  for (let pkg of packages) {
     let tagname = `${pkg.name.split("/")[1]}-v${pkg.version}`;
 
     let git = yield* x(`git`, [`tag`, `--list`, tagname]);
@@ -29,7 +36,7 @@ await main(function* () {
     // ergo we publish
     if (output.join("").trim() === "") {
       include.push({
-        workspace: pkgmeta.workspace,
+        workspace: pkg.workspace,
         tagname,
         name: pkg.name,
         version: pkg.version,
@@ -59,3 +66,28 @@ await main(function* () {
     );
   }
 });
+
+function* readPackages(): Operation<PackageConfig[]> {
+  const root = yield* call(() => import("../deno.json", {
+    with: { type: "json" },
+  }));
+
+  console.log(`Found ${root.default.workspace.join(", ")}`);
+
+  const configs: PackageConfig[] = [];
+  for (let workspace of root.default.workspace) {
+    const workspacePath = resolve(Deno.cwd(), workspace);
+
+    const config = yield* call(() => Deno.readTextFile(`${workspacePath}/deno.json`))
+
+    const denoJson = DenoJson.parse(JSON.parse(config));
+
+    configs.push({
+      ...denoJson,
+      workspace,
+      workspacePath,
+    });
+  }
+
+  return configs;
+}
