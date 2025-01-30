@@ -68,9 +68,11 @@ await main(function* () {
 });
 
 function* readPackages(): Operation<PackageConfig[]> {
-  const root = yield* call(() => import("../deno.json", {
-    with: { type: "json" },
-  }));
+  const root = yield* call(() =>
+    import("../deno.json", {
+      with: { type: "json" },
+    })
+  );
 
   console.log(`Found ${root.default.workspace.join(", ")}`);
 
@@ -78,7 +80,9 @@ function* readPackages(): Operation<PackageConfig[]> {
   for (let workspace of root.default.workspace) {
     const workspacePath = resolve(Deno.cwd(), workspace);
 
-    const config = yield* call(() => Deno.readTextFile(`${workspacePath}/deno.json`))
+    const config = yield* call(() =>
+      Deno.readTextFile(`${workspacePath}/deno.json`)
+    );
 
     const denoJson = DenoJson.parse(JSON.parse(config));
 
