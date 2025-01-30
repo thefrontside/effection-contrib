@@ -74,25 +74,25 @@ export interface WorkerMainOptions<TSend, TRecv, TData> {
  *  });
  * });
  * ```
- * 
+ *
  * @example Responding to messages and return a value
  * ```ts
  * import { workerMain } from "../worker.ts";
- * 
+ *
  * await workerMain<number, number, number, number>(
  *   function* ({ messages, data: initial }) {
  *     let counter = initial;
- * 
+ *
  *     yield* messages.forEach(function* (message) {
  *       counter += message;
  *       return counter; // returns a value after each message
  *     });
- *     
+ *
  *     return counter; // returns the final value
  *   },
  * );
  * ```
- * 
+ *
  * @template TSend - value main thread will send to the worker
  * @template TRecv - value main thread will receive from the worker
  * @template TReturn - worker operation return value
@@ -189,7 +189,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  *      const result1 = yield* worker.send("Tom");
  *      const result2 = yield* worker.send("Dick");
  *      const result2 = yield* worker.send("Harry");
- *      
+ *
  *      // get the last result
  *      const finalResult = yield* worker;
  *    } catch (e) {

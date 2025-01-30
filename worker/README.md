@@ -20,9 +20,11 @@ thread.
 
 ## Usage: Get worker's return value
 
-The return value of the worker is the return value of the function passed to `workerMain`.
+The return value of the worker is the return value of the function passed to
+`workerMain`.
 
 ### Worker thread
+
 ```ts
 import { workerMain } from "@effection-contrib/worker";
 
@@ -45,8 +47,8 @@ await workerMain<number, number, number, number>(function* fibonacci({
 
 ### Main Thread
 
-You can easily retrieve this value from the worker object returned by `useWorker` function in
-the main thread.
+You can easily retrieve this value from the worker object returned by
+`useWorker` function in the main thread.
 
 ```ts
 import { run } from "effection";
@@ -69,8 +71,8 @@ await run(function* () {
 
 ### Error handling
 
-Errors thrown in the function passed to `workerMain` can be captured in the
-main thread by wrapping `yield* worker` in a `try/catch` block;
+Errors thrown in the function passed to `workerMain` can be captured in the main
+thread by wrapping `yield* worker` in a `try/catch` block;
 
 ```ts
 try {
@@ -84,8 +86,8 @@ try {
 
 ## Usage: Sending messages to the worker
 
-The worker can respond to incoming messages using `forEach` function provided
-by the `messages` object passed to the `workerMain` function.  
+The worker can respond to incoming messages using `forEach` function provided by
+the `messages` object passed to the `workerMain` function.
 
 ### Worker Thread
 
@@ -106,10 +108,9 @@ await workerMain<number, number, void, number>(function* ({ messages, data }) {
 
 ### Main Thread
 
-The main thread can send messages to the worker using the `send` method on the 
+The main thread can send messages to the worker using the `send` method on the
 object returned by `useWorker`. Effection will wait for the value to be returned
 from the worker before continueing.
-
 
 ```ts
 import { run } from "effection";
