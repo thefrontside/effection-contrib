@@ -28,6 +28,7 @@
     "./jsonl-store",
     "./fx",
     "./task-buffer",
+    "./test-adapter",
     "./tinyexec",
     "./timebox",
     "./websocket",
