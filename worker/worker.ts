@@ -1,4 +1,4 @@
-import { assert } from "https://deno.land/std@0.158.0/testing/asserts.ts";
+import { assert } from "jsr:@std/assert@1";
 import {
   createSignal,
   each,
@@ -22,9 +22,9 @@ export interface WorkerResource<TSend, TRecv, TReturn>
 
 /**
  * Object that represents messages the main thread
- * sends to the worker. It provides function for 
+ * sends to the worker. It provides function for
  * handling messages.
- * 
+ *
  * @template TSend - value main thread will send to the worker
  * @template TRecv - value main thread will receive from the worker
  */
@@ -176,10 +176,10 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  *
  * @param url {URL} or {string} of script
  * @param options {WorkerOptions}
- * @template TSend - type of value main thread will send to the worker
- * @template TRecv - type of value main thread will receive from the worker
- * @template TReturn - type of worker operation return value
- * @template TData - type of data passed from the main thread to the worker during initialization
+ * @template TSend - value main thread will send to the worker
+ * @template TRecv - value main thread will receive from the worker
+ * @template TReturn - worker operation return value
+ * @template TData - data passed from the main thread to the worker during initialization
  * @returns {Operation<WorkerResource<TSend, TRecv>>}
  */
 export function useWorker<TSend, TRecv, TReturn, TData>(
