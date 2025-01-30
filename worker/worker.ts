@@ -51,10 +51,11 @@ export interface WorkerMainOptions<TSend, TRecv, TData> {
 }
 
 /**
- * Use this function in the worker to wrap the operation function that
- * will perform the calculation. Used for both stateless and stateful workers.
+ * Entrypoint used in the worker that estaliblishes communication
+ * with the main thread. It can be used to return a value,
+ * respond to messages or both.
  *
- * @example Stateless worker
+ * @example Returning a value
  * ```ts
  * import { workerMain } from "../worker.ts";
  *
@@ -63,7 +64,7 @@ export interface WorkerMainOptions<TSend, TRecv, TData> {
  * });
  * ```
  *
- * @example Stateful worker
+ * @example Responding to messages
  * ```ts
  * import { workerMain } from "../worker.ts";
  *
@@ -73,7 +74,25 @@ export interface WorkerMainOptions<TSend, TRecv, TData> {
  *  });
  * });
  * ```
- *
+ * 
+ * @example Responding to messages and return a value
+ * ```ts
+ * import { workerMain } from "../worker.ts";
+ * 
+ * await workerMain<number, number, number, number>(
+ *   function* ({ messages, data: initial }) {
+ *     let counter = initial;
+ * 
+ *     yield* messages.forEach(function* (message) {
+ *       counter += message;
+ *       return counter; // returns a value after each message
+ *     });
+ *     
+ *     return counter; // returns the final value
+ *   },
+ * );
+ * ```
+ * 
  * @template TSend - value main thread will send to the worker
  * @template TRecv - value main thread will receive from the worker
  * @template TReturn - worker operation return value
@@ -142,7 +161,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
 /**
  * Use on the main thread to create and exeecute a well behaved web worker.
  *
- * @example Stateless worker
+ * @example Compute a single value
  * ```ts
  * import { run } from "effection";
  * import { useWorker } from "@effection-contrib/worker"
@@ -158,7 +177,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  * });
  * ```
  *
- * @exampel Stateful worker
+ * @example Compute multipe values
  * ```ts
  * import { run } from "effection";
  * import { useWorker } from "@effection-contrib/worker"
@@ -167,7 +186,12 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  *    const worker = yield* useWorker("script.ts", { type: "module" });
  *
  *    try {
- *      const result = yield* worker.send("hello world");
+ *      const result1 = yield* worker.send("Tom");
+ *      const result2 = yield* worker.send("Dick");
+ *      const result2 = yield* worker.send("Harry");
+ *      
+ *      // get the last result
+ *      const finalResult = yield* worker;
  *    } catch (e) {
  *      console.error(e);
  *    }

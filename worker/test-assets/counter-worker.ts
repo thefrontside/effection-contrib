@@ -1,6 +1,6 @@
 import { workerMain } from "../worker.ts";
 
-await workerMain<number, number, void, number>(
+await workerMain<number, number, number, number>(
   function* ({ messages, data: initial }) {
     let counter = initial;
 
@@ -8,5 +8,7 @@ await workerMain<number, number, void, number>(
       counter += message;
       return counter;
     });
+
+    return counter;
   },
 );
