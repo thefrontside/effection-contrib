@@ -25,16 +25,11 @@ await main(function* () {
 
     let git = yield* x(`git`, [`tag`, `--list`, tagname]);
 
-    let output = [];
-
-    for (let line of yield* each(git.lines)) {
-      output.push(line);
-      yield* each.next();
-    }
+    let { stdout } = yield* git;
 
     // if output of `git tag --list ${{tagname}}` is empty, tag does not exists
     // ergo we publish
-    if (output.join("").trim() === "") {
+    if (stdout.trim() === "") {
       include.push({
         workspace: pkg.workspace,
         tagname,
@@ -88,7 +83,7 @@ function* readPackages(): Operation<PackageConfig[]> {
 
     configs.push({
       ...denoJson,
-      workspace,
+      workspace: workspace.replace("./", ""),
       workspacePath,
     });
   }
