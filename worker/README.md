@@ -110,7 +110,7 @@ await workerMain<number, number, void, number>(function* ({ messages, data }) {
 
 The main thread can send messages to the worker using the `send` method on the
 object returned by `useWorker`. Effection will wait for the value to be returned
-from the worker before continueing.
+from the worker before continuing.
 
 ```ts
 import { run } from "effection";
