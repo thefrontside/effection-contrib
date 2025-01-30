@@ -1,16 +1,15 @@
-import { build, emptyDir } from "jsr:@deno/dnt";
-import { DenoJson } from "./publish-matrix.ts";
-
-const outDir = "./build/npm";
-
-await emptyDir(outDir);
+import { build, emptyDir } from "jsr:@deno/dnt@0.41.3";
+import { DenoJson } from "./lib/read-packages.ts";
+import { join } from "jsr:@std/path@^1.0.7/join";
 
 let [workspace] = Deno.args;
 if (!workspace) {
-  throw new Error("a version argument is required to build the npm package");
+  throw new Error("workspace path is required build npm package");
 }
 
-let mod = await import(`../../${workspace}/deno.json`, {
+Deno.chdir(workspace);
+
+let mod = await import(join(Deno.cwd(), `/deno.json`), {
   with: { type: "json" },
 });
 
@@ -24,7 +23,9 @@ let entryPoints = typeof deno.exports === "string"
     path,
   }));
 
-Deno.chdir(workspace);
+const outDir = "./build/npm";
+
+await emptyDir(outDir);
 
 await build({
   entryPoints,
