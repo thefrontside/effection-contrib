@@ -1,5 +1,5 @@
 import { build, emptyDir } from "jsr:@deno/dnt";
-import { DenoJson } from "../hooks/use-package.tsx";
+import { DenoJson } from "./publish-matrix.ts";
 
 const outDir = "./build/npm";
 
