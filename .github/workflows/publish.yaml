@@ -19,7 +19,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - run: deno run -A www/tasks/publish-matrix.ts
+      - run: deno run -A tasks/publish-matrix.ts
         id: set-matrix
 
   jsr:
@@ -69,7 +69,7 @@ jobs:
           node-version: 20.x
           registry-url: https://registry.npmjs.com
 
-      - run: deno run -A www/tasks/build-npm.ts ${{matrix.workspace}}
+      - run: deno run -A tasks/build-npm.ts ${{matrix.workspace}}
 
       - run: npm publish --access=public --tag=latest
         working-directory: ${{matrix.workspace}}/build/npm
