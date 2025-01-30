@@ -1,4 +1,4 @@
-import { call, each, main, type Operation } from "effection";
+import { call, main, type Operation } from "effection";
 import { x } from "../tinyexec/mod.ts";
 import { z } from "npm:zod@3.23.8";
 import { resolve } from "jsr:@std/path@^1.0.6";
