@@ -3,7 +3,7 @@ import { x } from "../tinyexec/mod.ts";
 import { z } from "npm:zod@3.23.8";
 import { resolve } from "jsr:@std/path@^1.0.6";
 
-const DenoJson = z.object({
+export const DenoJson = z.object({
   name: z.string(),
   version: z.string(),
   exports: z.union([z.record(z.string()), z.string()]),

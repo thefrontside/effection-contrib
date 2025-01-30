@@ -22,6 +22,8 @@ jobs:
         with:
           deno-version: v2.x
 
+      - run: deno check tasks/*.ts
+
       - run: deno fmt --check
 
       - run: deno lint
