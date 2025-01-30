@@ -1,4 +1,4 @@
-import { call, each, main, type Operation } from "effection";
+import { call, main, type Operation } from "effection";
 import { x } from "../tinyexec/mod.ts";
 import { z } from "npm:zod@3.23.8";
 import { resolve } from "jsr:@std/path@^1.0.6";
@@ -25,16 +25,11 @@ await main(function* () {
 
     let git = yield* x(`git`, [`tag`, `--list`, tagname]);
 
-    let output = [];
-
-    for (let line of yield* each(git.lines)) {
-      output.push(line);
-      yield* each.next();
-    }
+    let { stdout } = yield* git;
 
     // if output of `git tag --list ${{tagname}}` is empty, tag does not exists
     // ergo we publish
-    if (output.join("").trim() === "") {
+    if (stdout.trim() === "") {
       include.push({
         workspace: pkg.workspace,
         tagname,
@@ -88,7 +83,7 @@ function* readPackages(): Operation<PackageConfig[]> {
 
     configs.push({
       ...denoJson,
-      workspace,
+      workspace: workspace.replace("./", ""),
       workspacePath,
     });
   }
