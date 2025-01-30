@@ -20,16 +20,24 @@ export interface WorkerResource<TSend, TRecv, TReturn>
   send(data: TSend): Operation<TRecv>;
 }
 
+/**
+ * Object that represents messages the main thread
+ * sends to the worker. It provides function for 
+ * handling messages.
+ * 
+ * @template TSend - value main thread will send to the worker
+ * @template TRecv - value main thread will receive from the worker
+ */
 export interface WorkerMessages<TSend, TRecv> {
   forEach(fn: (message: TSend) => Operation<TRecv>): Operation<void>;
 }
 
 /**
- * Argument recieved by workerMain function
+ * Argument received by workerMain function
  *
- * @template TSend - type of value main thread will send to the worker
- * @template TRecv - type of value main thread will receive from the worker
- * @template TData - type of data passed from the main thread to the worker during initialization
+ * @template TSend - value main thread will send to the worker
+ * @template TRecv - value main thread will receive from the worker
+ * @template TData - data passed from the main thread to the worker during initialization
  */
 export interface WorkerMainOptions<TSend, TRecv, TData> {
   /**
@@ -66,10 +74,10 @@ export interface WorkerMainOptions<TSend, TRecv, TData> {
  * });
  * ```
  *
- * @template TSend - type of value main thread will send to the worker
- * @template TRecv - type of value main thread will receive from the worker
- * @template TReturn - type of worker operation return value
- * @template TData - type of data passed from the main thread to the worker during initialization
+ * @template TSend - value main thread will send to the worker
+ * @template TRecv - value main thread will receive from the worker
+ * @template TReturn - worker operation return value
+ * @template TData - data passed from the main thread to the worker during initialization
  * @param {(options: WorkerMainOptions<TSend, TRecv, TData>) => Operation<TReturn>} body
  * @returns {Promise<void>}
  */
