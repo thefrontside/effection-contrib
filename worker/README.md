@@ -1,8 +1,8 @@
 # Web Worker
 
-Easily use Web Workers to offload CPU-intensive computations or manage
-external processes. A library for seamlessly integrating [Web Workers][Web Workers] 
-with Effection programs.
+Easily use Web Workers to offload CPU-intensive computations or manage external
+processes. A library for seamlessly integrating [Web Workers][Web Workers] with
+Effection programs.
 
 ---
 
