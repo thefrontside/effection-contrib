@@ -199,7 +199,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  * ```
  *
  * @param url URL or string of script
- * @param options {WorkerOptions}
+ * @param options WorkerOptions
  * @template TSend - value main thread will send to the worker
  * @template TRecv - value main thread will receive from the worker
  * @template TReturn - worker operation return value
