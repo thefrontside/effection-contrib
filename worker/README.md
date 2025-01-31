@@ -4,7 +4,7 @@ Easily offload compute intensive computations to another thread or manage
 external external processes using Web Workers. A library for seamlessly
 integrating [Web Workers][Web Workers] with Effection programs.
 
---
+---
 
 This package provides two functions. {@link useWorker} used in the main thread
 to start and establish communication with the worker. {@link workerMain} used in
