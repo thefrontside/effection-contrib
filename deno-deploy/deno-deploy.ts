@@ -2,7 +2,7 @@ import {
   type Context,
   createContext,
   type Operation,
-} from "npm:effection@3.0.3";
+} from "npm:effection@4.0.0-alpha.6";
 
 export interface DenoDeploy {
   /**
@@ -56,7 +56,7 @@ export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>(
  * ```
  */
 export function* useDenoDeploy(): Operation<DenoDeploy> {
-  return yield* DenoDeployContext;
+  return yield* DenoDeployContext.expect();
 }
 
 /**
