@@ -85,7 +85,7 @@ const anonymousNames: Iterator<string, never> = (function* () {
  * Create a new test adapter with the given options.
  */
 export function createTestAdapter(
-  options: TestAdapterOptions,
+  options: TestAdapterOptions = {},
 ): TestAdapter {
   let setups: TestOperation[] = [];
   let { parent, name = anonymousNames.next().value } = options;
