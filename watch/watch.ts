@@ -37,6 +37,10 @@ export interface Start {
   restarting: Operation<void>;
 }
 
+/**
+ * A watch is a strema of process starts that happen in reaction
+ * to some source file changing on the file system.
+ */
 export interface Watch extends Stream<Result<Process>, never> {}
 
 /**
