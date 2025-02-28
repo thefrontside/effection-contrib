@@ -1,6 +1,7 @@
 {
   "name": "@effection-contrib/watch",
   "version": "0.1.0",
+  "license": "MIT",
   "exports": {
     ".": "./main.ts",
     "./lib": "./mod.ts"
