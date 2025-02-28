@@ -1,9 +1,19 @@
 import type { Operation, Result, Stream } from "effection";
 import { call, each, Ok, run, sleep, spawn } from "effection";
-import { describe, it } from "bdd";
+import { describe, it as bddIt } from "bdd";
 import { expect } from "expect";
 import { assert } from "jsr:@std/assert";
 import { emptyDir } from "jsr:@std/fs/empty-dir";
+
+// temporariy disable watch tests on linux because of
+// https://github.com/denoland/deno/issues/28041
+function it(...args: Parameters<typeof bddIt>) {
+  if (Deno.build.os === "linux") {
+    return bddIt.skip(...args);
+  }
+  return bddIt(...args);
+}
+it.skip = bddIt.skip;
 
 describe("watch", () => {
   it("restarts the specified process when files change.", async () => {
