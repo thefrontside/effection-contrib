@@ -22,16 +22,25 @@ If you are running this command inside a git repository, it will only perform
 restarts on files that are under source control, or could be candidates for
 source control (not ignored).
 
-## Use it as a library
+q## Use it as an Effection library
+
+Most of the time, you will use this an executable. However, if you want to
+create your own watch from within a library, you can But if you want to write
+your own
 
 ```ts
-import { main } from "effection";
+import { each, main } from "effection";
 import { watch } from "@effection-contrib/watch";
 
 await main(function* () {
-  const watcher = yield* watch({
+  const changes = watch({
     path: "./src",
     cmd: "npm test",
   });
+
+  for (let start of yield* each(changes)) {
+    console.log(start);
+    yield* each.next();
+  }
 });
 ```
