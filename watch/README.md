@@ -1,4 +1,4 @@
-# @effection-contrib/watch
+# Watch
 
 Watch is a very simple tool that does one thing: run a command, and every time
 source files change in a directory, shutdown the current invocation _gracefully_
@@ -22,7 +22,7 @@ If you are running this command inside a git repository, it will only perform
 restarts on files that are under source control, or could be candidates for
 source control (not ignored).
 
-q## Use it as an Effection library
+## Use it as an Effection library
 
 Most of the time, you will use this an executable. However, if you want to
 create your own watch from within a library, you can But if you want to write
