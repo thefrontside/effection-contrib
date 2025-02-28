@@ -79,7 +79,7 @@ export interface WatchOptions {
  * @param options.cmd - The command to execute when changes are detected
  * @param options.event - The type of event to watch for ('all' or 'change', defaults to 'all')
  *
- * @returns A Stream that emits {Result<Process>} for each command execution
+ * @returns A Stream that emits `Result<Process>` for each command execution
  *
  * @remarks
  * - Uses chokidar for file system watching
