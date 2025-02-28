@@ -7,7 +7,7 @@ import denoJson from "./deno.json" with { type: "json" };
 
 const builtins = ["-h", "--help", "-V", "--version"];
 
-await main(function* (argv) {
+main(function* (argv) {
   let { args, rest } = extract(argv);
   parser()
     .name("watch")
