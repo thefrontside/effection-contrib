@@ -1,0 +1,6 @@
+{
+  "name": "@effectionx/raf",
+  "version": "1.0.0-alpha.0",
+  "exports": "./mod.ts",
+  "license": "MIT"
+}
