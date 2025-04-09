@@ -17,6 +17,6 @@ more than a few times are welcome.
 
 ## To publish a new project
 
-1. Member of [jsr.io/@effectionx](https://jsr.io/@effectionx) has
-   too add that project to the scope
+1. Member of [jsr.io/@effectionx](https://jsr.io/@effectionx) has to add that
+   project to the scope
 2. It should be publish on next merge to main
