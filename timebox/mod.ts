@@ -57,7 +57,7 @@ export interface Timeout {
  *
  * @example
  * ```ts
- * import { timebox } from "@effection-contrib/timebox";
+ * import { timebox } from "@effectionx/timebox";
  * import { handleRequest } from "./handle-request";
 
  * // a theoretical request handler

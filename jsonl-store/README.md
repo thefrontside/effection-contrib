@@ -15,7 +15,7 @@ You can use the default store client which will write store to
 
 ```ts
 import { run } from "npm:effection@4.0.0-alpha.3";
-import { useStore } from "jsr:@effection-contrib/jsonl-store";
+import { useStore } from "jsr:@effectionx/jsonl-store";
 
 await run(function* () {
   const store = yield* useStore();
@@ -35,7 +35,7 @@ import {
   JSONLStore,
   StoreContext,
   useStore,
-} from "jsr:@effection-contrib/jsonl-store";
+} from "jsr:@effectionx/jsonl-store";
 
 await run(function* () {
   const store = JSONLStore.from({
@@ -51,7 +51,7 @@ You can write to the store at a given key and append to the same key.
 
 ```ts
 import { run } from "npm:effection@4.0.0-alpha.3";
-import { useStore } from "jsr:@effection-contrib/jsonl-store";
+import { useStore } from "jsr:@effectionx/jsonl-store";
 
 await run(function* () {
   const store = yield* useStore();
@@ -72,7 +72,7 @@ Reading values from a key produces a stream of all values from the given key.
 
 ```ts
 import { run } from "npm:effection@4.0.0-alpha.3";
-import { useStore } from "jsr:@effection-contrib/jsonl-store";
+import { useStore } from "jsr:@effectionx/jsonl-store";
 
 await run(function* () {
   const store = yield* useStore();

@@ -19,7 +19,7 @@ This package simplifies WebSocket usage by:
 
 ```typescript
 import { each, main } from "effection";
-import { useWebSocket } from "@effection-contrib/websocket";
+import { useWebSocket } from "@effectionx/websocket";
 
 await main(function* () {
   // Connection is guaranteed to be open when this returns
@@ -56,7 +56,7 @@ provide your own WebSocket implementation:
 ```typescript
 import { createWebSocket } from "my-websocket-client";
 import { each, main } from "effection";
-import { useWebSocket } from "@effection-contrib/websocket";
+import { useWebSocket } from "@effectionx/websocket";
 
 await main(function* () {
   let socket = yield* useWebSocket(() =>

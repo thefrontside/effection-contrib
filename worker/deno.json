@@ -1,5 +1,5 @@
 {
-  "name": "@effection-contrib/worker",
+  "name": "@effectionx/worker",
   "version": "0.1.0",
   "license": "MIT",
   "exports": "./mod.ts"

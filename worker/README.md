@@ -26,7 +26,7 @@ The return value of the worker is the return value of the function passed to
 ### Worker thread
 
 ```ts
-import { workerMain } from "@effection-contrib/worker";
+import { workerMain } from "@effectionx/worker";
 
 await workerMain<number, number, number, number>(function* fibonacci({
   data: n, // data sent to the worker from the main thread
@@ -52,7 +52,7 @@ You can easily retrieve this value from the worker object returned by
 
 ```ts
 import { run } from "effection";
-import { useWorker } from "@effection-contrib/worker";
+import { useWorker } from "@effectionx/worker";
 
 await run(function* () {
   const worker = yield* useWorker<number, number, number, number>(
@@ -114,7 +114,7 @@ from the worker before continuing.
 
 ```ts
 import { run } from "effection";
-import { useWorker } from "@effection-contrib/worker";
+import { useWorker } from "@effectionx/worker";
 
 await run(function* () {
   const worker = yield* useWorker<number, number, number, number>(
