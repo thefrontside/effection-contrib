@@ -1,14 +1,15 @@
 # RAF: Request Animation Frame
 
-Subscribe to a stream of Request Animation Frame updates with an Effection resource. 
+Subscribe to a stream of Request Animation Frame updates with an Effection
+resource.
 
 ---
 
 ```ts
-import { main, each, suspend } from "effection";
+import { each, main, suspend } from "effection";
 import { raf } from "@effectionx/raf";
 
-await main(function*() {
+await main(function* () {
   for (const frame of yield* each(raf)) {
     console.log(frame);
     yield* each.next();

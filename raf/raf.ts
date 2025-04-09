@@ -1,4 +1,8 @@
-import { type Stream, resource, createSignal } from "jsr:@effection/effection@4.0.0-alpha.7";
+import {
+  createSignal,
+  resource,
+  type Stream,
+} from "jsr:@effection/effection@4.0.0-alpha.7";
 /**
  * Consume RAF's as a Stream.
  */

@@ -7,11 +7,11 @@ import { raf } from "./raf.ts";
 rafPolyfill.polyfill();
 
 describe("raf", () => {
-  it("subscription", async() => {
+  it("subscription", async () => {
     expect.assertions(1);
     let count = 0;
-    await run(function*() {
-      yield* spawn(function*() {
+    await run(function* () {
+      yield* spawn(function* () {
         for (const _ of yield* each(raf)) {
           count++;
           yield* each.next();
@@ -21,4 +21,4 @@ describe("raf", () => {
     });
     expect(count > 5).toBe(true);
   });
-})
+});
