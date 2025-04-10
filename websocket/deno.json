@@ -1,5 +1,5 @@
 {
-  "name": "@effection-contrib/websocket",
+  "name": "@effectionx/websocket",
   "version": "2.0.0",
   "exports": "./mod.ts",
   "license": "MIT"

@@ -1,5 +1,5 @@
 {
-  "name": "@effection-contrib/jsonl-store",
+  "name": "@effectionx/jsonl-store",
   "version": "0.1.0",
   "exports": "./mod.ts",
   "license": "MIT"

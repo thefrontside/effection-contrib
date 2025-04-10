@@ -39,7 +39,7 @@ export interface TaskBuffer extends Operation<void> {
  *
  * ```ts
  * import { run, sleep } from "effection";
- * import { useTaskBuffer } from "@effection-contrib/task-buffer";
+ * import { useTaskBuffer } from "@effectionx/task-buffer";
  *
  * await run(function*() {
  *  const buffer = yield* useTaskBuffer(2);

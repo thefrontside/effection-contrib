@@ -1,5 +1,5 @@
 {
-  "name": "@effection-contrib/deno-deploy",
+  "name": "@effectionx/deno-deploy",
   "version": "0.1.0",
   "exports": "./mod.ts",
   "license": "MIT"

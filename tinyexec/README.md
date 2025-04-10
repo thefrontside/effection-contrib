@@ -8,7 +8,7 @@ Effection compatible wrapper around
 To run a process, use the `x` function:
 
 ```ts
-import { x } from "@effection-contrib/tinyexec";
+import { x } from "@effectionx/tinyexec";
 import { each, main } from "effection";
 
 await main(function* () {
@@ -27,7 +27,7 @@ example, the following shows the output of the `top` command for five seconds
 before exiting.
 
 ```ts
-import { x } from "@effection-contrib/tinyexec";
+import { x } from "@effectionx/tinyexec";
 import { each, main, sleep, spawn } from "effection";
 
 await main(function* () {
