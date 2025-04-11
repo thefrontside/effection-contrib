@@ -2,7 +2,7 @@ import {
   createSignal,
   resource,
   type Stream,
-} from "jsr:@effection/effection@4.0.0-alpha.7";
+} from "effection";
 /**
  * Consume RAF's as a Stream.
  */

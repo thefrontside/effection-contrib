@@ -1,5 +1,5 @@
 import rafPolyfill from "npm:raf@^3.0.0";
-import { each, run, sleep, spawn } from "npm:effection@4.0.0-alpha.7";
+import { each, run, sleep, spawn } from "effection";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { raf } from "./raf.ts";
