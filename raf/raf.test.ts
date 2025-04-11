@@ -10,8 +10,8 @@ import { raf } from "./raf.ts";
 
 Object.assign(globalThis, {
   requestAnimationFrame,
-  cancelAnimationFrame
-})
+  cancelAnimationFrame,
+});
 
 describe("raf", () => {
   it("subscription", async () => {

@@ -1,8 +1,4 @@
-import {
-  createSignal,
-  resource,
-  type Stream,
-} from "effection";
+import { createSignal, resource, type Stream } from "effection";
 /**
  * Consume RAF's as a Stream.
  */
