@@ -43,10 +43,10 @@ await build({
     author: "engineering@frontside.com",
     repository: {
       type: "git",
-      url: "git+https://github.com/thefrontside/effection-contrib.git",
+      url: "git+https://github.com/thefrontside/effectionx.git",
     },
     bugs: {
-      url: "https://github.com/thefrontside/effection-contrib/issues",
+      url: "https://github.com/thefrontside/effectionx/issues",
     },
     engines: {
       node: ">= 16",

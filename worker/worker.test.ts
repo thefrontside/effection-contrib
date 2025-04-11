@@ -2,7 +2,7 @@ import { describe, it } from "bdd";
 import { expect } from "expect";
 import { emptyDir, exists } from "jsr:@std/fs";
 import { join } from "jsr:@std/path@^1.0.7";
-import { timebox } from "jsr:@effection-contrib/timebox@^0.1.0";
+import { timebox } from "jsr:@effectionx/timebox@^0.1.0";
 import {
   call,
   run,

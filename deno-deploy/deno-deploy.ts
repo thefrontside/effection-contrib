@@ -48,7 +48,7 @@ export const DenoDeployContext: Context<DenoDeploy> = createContext<DenoDeploy>(
  * Use to read the values of Deno Deploy Context.
  *
  * ```ts
- * import { useDenoDeploy } from "@effection-contrib/deno-deploy";
+ * import { useDenoDeploy } from "@effectionx/deno-deploy";
  *
  * function* () {
  *  const { isDenoDeploy } = yield* useDenoDeploy();
@@ -64,7 +64,7 @@ export function* useDenoDeploy(): Operation<DenoDeploy> {
  *
  * ```ts
  * import { main } from "effection";
- * import { initDenoDeploy } from "@effection-contrib/deno-deploy";
+ * import { initDenoDeploy } from "@effectionx/deno-deploy";
  *
  * await main(function*() {
  *  yield* initDenoDeploy();

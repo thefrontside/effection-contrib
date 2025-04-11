@@ -164,7 +164,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  * @example Compute a single value
  * ```ts
  * import { run } from "effection";
- * import { useWorker } from "@effection-contrib/worker"
+ * import { useWorker } from "@effectionx/worker"
  *
  * await run(function*() {
  *    const worker = yield* useWorker("script.ts", { type: "module" });
@@ -180,7 +180,7 @@ export async function workerMain<TSend, TRecv, TReturn, TData>(
  * @example Compute multipe values
  * ```ts
  * import { run } from "effection";
- * import { useWorker } from "@effection-contrib/worker"
+ * import { useWorker } from "@effectionx/worker"
  *
  * await run(function*() {
  *    const worker = yield* useWorker("script.ts", { type: "module" });
