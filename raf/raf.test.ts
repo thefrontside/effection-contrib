@@ -1,10 +1,17 @@
-import rafPolyfill from "npm:raf@^3.0.0";
+import {
+  caf as cancelAnimationFrame,
+  raf as requestAnimationFrame,
+} from "npm:@essentials/raf@^1.2.0";
+
 import { each, run, sleep, spawn } from "effection";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { raf } from "./raf.ts";
 
-rafPolyfill.polyfill();
+Object.assign(globalThis, {
+  requestAnimationFrame,
+  cancelAnimationFrame
+})
 
 describe("raf", () => {
   it("subscription", async () => {
@@ -20,6 +27,8 @@ describe("raf", () => {
       });
       yield* sleep(100);
     });
+
+    console.log("done");
     expect(count > 5).toBe(true);
   });
 });
