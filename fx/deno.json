@@ -1,6 +1,6 @@
 {
-  "name": "@effection-contrib/fx",
-  "version": "0.1.0",
+  "name": "@effectionx/fx",
+  "version": "0.1.1",
   "exports": "./mod.ts",
   "license": "MIT"
 }

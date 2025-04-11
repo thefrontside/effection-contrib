@@ -11,7 +11,7 @@ return its result, or a otherwise a "timeout" object indicating that it did not
 complete in the required time.
 
 ```ts
-import { timebox } from "@effection-contrib/timebox";
+import { timebox } from "@effectionx/timebox";
 import { handleRequest } from "./handle-request";
 
 // a theoretical request handler

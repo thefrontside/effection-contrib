@@ -1,6 +1,6 @@
 {
-  "name": "@effection-contrib/tinyexec",
-  "version": "0.1.1",
+  "name": "@effectionx/tinyexec",
+  "version": "0.1.2",
   "exports": "./mod.ts",
   "license": "MIT"
 }

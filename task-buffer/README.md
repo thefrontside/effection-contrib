@@ -11,7 +11,7 @@ prevents resource overload while ensuring all tasks are eventually executed.
 
 ```ts
 import { run, sleep } from "effection";
-import { useTaskBuffer } from "@effection-contrib/task-buffer";
+import { useTaskBuffer } from "@effectionx/task-buffer";
 
 await run(function* () {
   // Create a task buffer with a maximum of 2 concurrent tasks

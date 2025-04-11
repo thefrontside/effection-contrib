@@ -5,7 +5,7 @@ source files change in a directory, shutdown the current invocation _gracefully_
 and restart it.
 
 ```
-deno -A jsr:@effection-contrib/watch npm start
+deno -A jsr:@effectionx/watch npm start
 ```
 
 ## Graceful Shutdown
@@ -30,7 +30,7 @@ your own
 
 ```ts
 import { each, main } from "effection";
-import { watch } from "@effection-contrib/watch";
+import { watch } from "@effectionx/watch";
 
 await main(function* () {
   const changes = watch({

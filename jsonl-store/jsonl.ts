@@ -67,7 +67,7 @@ export class JSONLStore implements Store {
   /**
    * Returns true when key is present
    * ```ts
-   * import { useStore } from "jsr:@effection-contrib/jsonl-store";
+   * import { useStore } from "jsr:@effectionx/jsonl-store";
    *
    * const store = yield* useStore();
    *
@@ -96,7 +96,7 @@ export class JSONLStore implements Store {
    *
    * ```ts
    * import { each } from "npm:effection@4.0.0-alpha.3";
-   * import { useStore } from "jsr:@effection-contrib/jsonl-store";
+   * import { useStore } from "jsr:@effectionx/jsonl-store";
    *
    * const store = yield* useStore();
    *
@@ -145,7 +145,7 @@ export class JSONLStore implements Store {
    * Write data to a file, creates the file and necessary directory structure as it goes along.
    *
    * ```ts
-   * import { useStore } from "jsr:@effection-contrib/jsonl-store";
+   * import { useStore } from "jsr:@effectionx/jsonl-store";
    *
    * const store = yield* useStore();
    * yield* store.write("hello", "world");
@@ -178,7 +178,7 @@ export class JSONLStore implements Store {
    * Add data to an existing file.
    *
    * ```ts
-   * import { useStore } from "jsr:@effection-contrib/jsonl-store";
+   * import { useStore } from "jsr:@effectionx/jsonl-store";
    *
    * const store = yield* useStore();
    * yield* store.write("hello", "world");
@@ -210,7 +210,7 @@ export class JSONLStore implements Store {
    *
    * ```ts
    * import { each } from "npm:effection@4.0.0-alpha.3";
-   * import { useStore } from "jsr:@effection-contrib/jsonl-store";
+   * import { useStore } from "jsr:@effectionx/jsonl-store";
    *
    * const store = yield* useStore();
    *

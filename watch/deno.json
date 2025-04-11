@@ -1,6 +1,6 @@
 {
-  "name": "@effection-contrib/watch",
-  "version": "0.1.1",
+  "name": "@effectionx/watch",
+  "version": "0.1.2",
   "license": "MIT",
   "exports": {
     ".": "./main.ts",

@@ -11,7 +11,7 @@ demonstrates the general pattern of lifecycle.
 
 ```ts
 import { run, sleep } from "effection";
-import { createTestAdapter, TestAdapter } from "@effection-contrib/test-adapter";
+import { createTestAdapter, TestAdapter } from "@effectionx/test-adapter";
 import { describe, it, beforeEach } from "@std/bdd";
 
 
