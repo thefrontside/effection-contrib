@@ -21,14 +21,12 @@ describe("raf", () => {
       yield* spawn(function* () {
         for (const _ of yield* each(raf)) {
           count++;
-          console.log(`${count}: ${_}`);
           yield* each.next();
         }
       });
       yield* sleep(100);
     });
 
-    console.log("done");
     expect(count > 5).toBe(true);
   });
 });
