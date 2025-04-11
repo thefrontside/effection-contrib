@@ -14,6 +14,7 @@ describe("raf", () => {
       yield* spawn(function* () {
         for (const _ of yield* each(raf)) {
           count++;
+          console.log(`${count}: ${_}`);
           yield* each.next();
         }
       });
