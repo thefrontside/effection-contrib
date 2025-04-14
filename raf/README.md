@@ -11,10 +11,9 @@ import { raf } from "@effectionx/raf";
 
 await main(function* () {
   for (const frame of yield* each(raf)) {
+    // add your handler code here
     console.log(frame);
     yield* each.next();
   }
-
-  yield* suspend();
 });
 ```
