@@ -1,7 +1,8 @@
 # RAF: Request Animation Frame
 
-Subscribe to a stream of Request Animation Frame updates with an Effection
-resource.
+Subscribe to a stream of
+[Request Animation Frame](https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame)
+updates.
 
 ---
 
@@ -10,9 +11,9 @@ import { each, main, suspend } from "effection";
 import { raf } from "@effectionx/raf";
 
 await main(function* () {
-  for (const frame of yield* each(raf)) {
+  for (const timestamp of yield* each(raf)) {
     // add your handler code here
-    console.log(frame);
+    console.log(timestamp);
     yield* each.next();
   }
 });
