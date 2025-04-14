@@ -1,6 +1,6 @@
 import { createSignal, resource, type Stream } from "effection";
 /**
- * Consume RAF's as a Stream.
+ * A stream that produces animation frames.
  */
 export const raf: Stream<number, never> = resource(
   function* (provide) {
