@@ -4,6 +4,6 @@
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
-    "effection": "npm:effection@^3"
+    "effection": "https://raw.githubusercontent.com/thefrontside/effection/v3/mod.ts"
   }
 }
