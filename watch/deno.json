@@ -7,7 +7,7 @@
     "./lib": "./mod.ts"
   },
   "imports": {
-    "effection": "npm:effection@^3.1.0",
+    "effection": "npm:effection@^3",
     "ignore": "npm:ignore@^7.0.3",
     "@std/fs": "jsr:@std/fs@^1.0.11",
     "@std/path": "jsr:@std/path@^1.0.8",
