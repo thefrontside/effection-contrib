@@ -30,7 +30,58 @@ export interface TaskBuffer extends Operation<void> {
    * @param op - the operation to spawn in the buffer.
    * @returns the spawned task.
    */
-  spawn<T>(op: () => Operation<T>): Operation<Operation<Task<T>>>;
+  enqueue<T>(op: () => Operation<T>): Operation<Operation<Task<T>>>;
+
+  /**
+   * Stop accepting new items and return once all in flight items have been
+   * processed. the {TaskBuffer}'s
+   */
+  close(): Operation<void>;
+}
+
+/**
+ * Configure how this buffer will enqueue tasks and apply back pressure.
+ */
+export interface TaskBufferOptions {
+  /**
+   * The maximum number of concurrently executing tasks in this
+   * buffer. Any operations enqueued while the buffer is at this
+   * capacity will be added to the pending queued until such time as
+   * there is available space in the buffer to run it.
+   */
+  maxConcurrency: number;
+
+  /**
+   * provide fine-grained control over the pending queue. When the
+   * specificied thresholds are reached, the open and close operations
+   * will be called to either stop or start the flow of items into the
+   * buffer.
+   */
+  valve?: {
+    /**
+    * When the pending queue reaches this number, the `close()`
+    * operation will be invoked.
+    */
+    closeAt: number;
+
+    /**
+     * When the task buffer's valve is closed, and the pending queue drops
+     * to this value, it will be re-opened
+     */
+    openAt: number;
+
+    /**
+     * Invoked when the valve is re-opened and operations can resume
+     * flowing
+     */
+    open(): Operation<void>;
+
+    /**
+     * Invoked when the valve is open, but the pending queue has
+     * crossed the `closeAt` threshold.
+     */
+    close(): Operation<void>;
+  };
 }
 
 /**
@@ -57,7 +108,10 @@ export interface TaskBuffer extends Operation<void> {
  * @param max - the maximum number of concurrent tasks.
  * @returns the new task buffer.
  */
-export function useTaskBuffer(max: number): Operation<TaskBuffer> {
+export function useTaskBuffer(
+  options: TaskBufferOptions,
+): Operation<TaskBuffer> {
+  let { maxConcurrency, valve } = options;
   return resource(function* (provide) {
     let input = createChannel<void, never>();
 
@@ -67,14 +121,16 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
 
     let scope = yield* useScope();
 
-    let requests: SpawnRequest<unknown>[] = [];
+    let queue: SpawnRequest<unknown>[] = [];
+
+    let opened = true;
 
     yield* spawn(function* () {
       while (true) {
-        if (requests.length === 0) {
+        if (queue.length === 0) {
           yield* next(input);
-        } else if (buffer.size < max) {
-          let request = requests.pop()!;
+        } else if (buffer.size < maxConcurrency) {
+          let request = queue.pop()!;
           let task = yield* scope.spawn(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
@@ -85,6 +141,11 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
             } catch (error) {
               buffer.delete(task);
               yield* output.send(Err(error as Error));
+            } finally {
+              if (!opened && valve && queue.length <= valve.openAt) {
+                yield* valve.open();
+                opened = true;
+              }
             }
           });
           request.resolve(task);
@@ -97,18 +158,33 @@ export function useTaskBuffer(max: number): Operation<TaskBuffer> {
     yield* provide({
       *[Symbol.iterator]() {
         let outputs = yield* output;
-        while (buffer.size > 0 || requests.length > 0) {
+        while (buffer.size > 0 || queue.length > 0) {
           yield* outputs.next();
         }
       },
-      *spawn<T>(fn: () => Operation<T>) {
+      *enqueue<T>(fn: () => Operation<T>) {
         let { operation, resolve } = withResolvers<Task<T>>();
-        requests.unshift({
+        if (opened && valve && queue.length >= valve.closeAt) {
+          yield* valve.close();
+          opened = false;
+        }
+        queue.unshift({
           operation: fn,
           resolve: resolve as Resolve<unknown>,
         });
+
         yield* input.send();
         return operation;
+      },
+      *close() {
+        if (opened && valve) {
+          yield* valve.close();
+        }
+        queue.length = 0;
+        let outputs = yield* output;
+        while (buffer.size > 0 || queue.length > 0) {
+          yield* outputs.next();
+        }
       },
     });
   });
