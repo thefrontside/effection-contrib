@@ -1,10 +1,4 @@
-import {
-  run,
-  sleep,
-  spawn,
-  type Task,
-  withResolvers,
-} from "effection";
+import { run, sleep, spawn, type Task, withResolvers } from "effection";
 import { describe, it } from "bdd";
 import { expect } from "expect";
 import { useTaskBuffer } from "./task-buffer.ts";
@@ -70,48 +64,47 @@ describe("TaskBuffer", () => {
       });
       let ops = Array(9).fill(null).map(() => withResolvers<void>());
       for (let i = 0; i <= 4; i++) {
-	yield* buffer.enqueue(() => ops[i].operation);
-	yield* sleep(0);
+        yield* buffer.enqueue(() => ops[i].operation);
+        yield* sleep(0);
       }
-      
+
       expect(closed).toEqual(0);
       yield* buffer.enqueue(() => ops[5].operation);
-      
+
       expect(closed).toEqual(1);
 
       ops[0].resolve();
       ops[1].resolve();
       ops[2].resolve();
-      
+
       yield* sleep(0);
-      
+
       expect(opened).toEqual(1);
 
       yield* buffer.enqueue(() => ops[6].operation);
       yield* buffer.enqueue(() => ops[7].operation);
-      yield* buffer.enqueue(() => ops[8].operation);      
+      yield* buffer.enqueue(() => ops[8].operation);
 
       expect(closed).toEqual(2);
     });
   });
 
   it("can be explicitly closed and flushed", async () => {
-    await run(function*() {
+    await run(function* () {
       let buffer = yield* useTaskBuffer({ maxConcurrency: 2 });
 
       let ops = Array(9).fill(null).map(() => withResolvers<void>());
 
       for (let op of ops) {
-	yield* buffer.enqueue(() => op.operation);
-	yield* sleep(0);
+        yield* buffer.enqueue(() => op.operation);
+        yield* sleep(0);
       }
 
-      
-      let done = false
+      let done = false;
 
-      yield* spawn(function*() {
-	yield* buffer.close();
-	done = true;
+      yield* spawn(function* () {
+        yield* buffer.close();
+        done = true;
       });
 
       expect(done).toEqual(false);

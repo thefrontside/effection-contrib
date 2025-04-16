@@ -9,7 +9,6 @@ import {
   spawn,
   type Stream,
   type Task,
-  useScope,
   withResolvers,
 } from "effection";
 
@@ -59,9 +58,9 @@ export interface TaskBufferOptions {
    */
   valve?: {
     /**
-    * When the pending queue reaches this number, the `close()`
-    * operation will be invoked.
-    */
+     * When the pending queue reaches this number, the `close()`
+     * operation will be invoked.
+     */
     closeAt: number;
 
     /**
@@ -119,8 +118,6 @@ export function useTaskBuffer(
 
     let buffer = new Set<Task<unknown>>();
 
-    let scope = yield* useScope();
-
     let queue: SpawnRequest<unknown>[] = [];
 
     let opened = true;
@@ -131,7 +128,7 @@ export function useTaskBuffer(
           yield* next(input);
         } else if (buffer.size < maxConcurrency) {
           let request = queue.pop()!;
-          let task = yield* scope.spawn(request.operation);
+          let task = yield* spawn(request.operation);
           buffer.add(task);
           yield* spawn(function* () {
             try {
@@ -139,6 +136,7 @@ export function useTaskBuffer(
               buffer.delete(task);
               yield* output.send(result);
             } catch (error) {
+              console.log({ error });
               buffer.delete(task);
               yield* output.send(Err(error as Error));
             } finally {
