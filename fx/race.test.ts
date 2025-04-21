@@ -1,6 +1,6 @@
 import { describe, it } from "bdd";
 import { expect } from "expect";
-import { run, sleep } from "npm:effection@3.0.3";
+import { run, sleep } from "npm:effection@4.0.0-alpha.8";
 
 import { raceMap } from "./race.ts";
 
@@ -10,6 +10,7 @@ it(
   test,
   "should return the result of the first completed operation",
   async () => {
+    expect.assertions(1);
     let winner;
 
     const result = await run(function* () {
@@ -34,6 +35,7 @@ it(
 );
 
 it(test, "should halt other operations when one completes", async () => {
+  expect.assertions(1);
   let winner;
   let secondCompleted = false;
 
