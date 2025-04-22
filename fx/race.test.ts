@@ -10,7 +10,6 @@ it(
   test,
   "should return the result of the first completed operation",
   async () => {
-    expect.assertions(1);
     let winner;
 
     const result = await run(function* () {
@@ -35,7 +34,6 @@ it(
 );
 
 it(test, "should halt other operations when one completes", async () => {
-  expect.assertions(1);
   let winner;
   let secondCompleted = false;
 
