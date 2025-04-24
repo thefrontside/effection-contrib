@@ -1,4 +1,4 @@
-import { createSignal, resource, type Operation } from "effection";
+import { createSignal, type Operation, resource } from "effection";
 
 import { StateParentContext, useStateParent } from "./context.ts";
 import type {

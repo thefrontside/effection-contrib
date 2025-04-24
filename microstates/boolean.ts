@@ -1,4 +1,4 @@
-import { resource, createSignal, type Operation } from "effection";
+import { createSignal, type Operation, resource } from "effection";
 import { useStateParent } from "./context.ts";
 import type { BooleanState } from "./types.ts";
 
@@ -26,6 +26,10 @@ export function boolean(initial: boolean = false): Operation<BooleanState> {
       },
     };
 
-    yield* provide(state);
+    try {
+      yield* provide(state);
+    } finally {
+      signal.close(ref.current);
+    }
   });
 }
