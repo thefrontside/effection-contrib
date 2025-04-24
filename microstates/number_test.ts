@@ -33,4 +33,15 @@ describe('number', () => {
       expect((yield* subscription.next()).value).toBe(41);
     });
   });
+
+  it("sets the value", async() => {
+    await run(function*() {
+      const n = yield* number(42);
+      const subscription = yield* n;
+
+      expect(yield* n.set(100)).toBe(100);
+
+      expect((yield* subscription.next()).value).toBe(100);
+    });
+  })
 });

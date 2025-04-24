@@ -37,4 +37,14 @@ describe("boolean", () => {
       });
     });
   });
+  describe("set", () => {
+    it("updates the value", async () => {
+      await run(function* () {
+        const bool = yield* boolean(true);
+        const subscription = yield* bool;
+        yield* bool.set(false);
+        expect((yield* subscription.next()).value).toBe(false);
+      });
+    });
+  });
 });

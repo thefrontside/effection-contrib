@@ -18,9 +18,19 @@ export function boolean(initial: boolean = false): Operation<BooleanState> {
       return ref.current;
     }
 
+    function* set(value: boolean) {
+      ref.current = value;
+
+      yield* parent.update(ref.current);
+      signal.send(ref.current);
+
+      return ref.current;
+    }
+
     const state: BooleanState = {
       [Symbol.iterator]: signal[Symbol.iterator],
       toggle,
+      set,
       get value() {
         return ref.current;
       },

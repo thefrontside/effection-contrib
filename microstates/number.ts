@@ -26,11 +26,21 @@ export function number(initial: number = 0): Operation<NumberState> {
 
       return ref.current;
     }
+    
+    function* set(value: number) {
+      ref.current = value;
+
+      yield* parent.update(ref.current);
+      signal.send(ref.current);
+
+      return ref.current;
+    }
 
     const state: NumberState = {
       [Symbol.iterator]: signal[Symbol.iterator],
       increment,
       decrement,
+      set,
       get value() {
         return ref.current;
       },
