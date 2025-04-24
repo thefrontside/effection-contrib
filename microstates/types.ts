@@ -18,7 +18,7 @@ export type NumberState = {
 
 export type State<T> = Stream<Initial<T>, Initial<T>> & {
   value: Initial<T>;
-  set(value: T): Operation<T>
+  set(value: T): Operation<T>;
 };
 
 export type ComposedState<T> = Yielded<T> & State<T>;

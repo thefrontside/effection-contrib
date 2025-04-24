@@ -26,7 +26,7 @@ export function number(initial: number = 0): Operation<NumberState> {
 
       return ref.current;
     }
-    
+
     function* set(value: number) {
       ref.current = value;
 

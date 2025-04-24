@@ -47,7 +47,7 @@ describe("state", () => {
 
       expect(next.value).toMatchObject({
         isOpen: true,
-        width: 1
+        width: 1,
       });
     });
   });

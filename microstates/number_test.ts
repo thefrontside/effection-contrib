@@ -3,17 +3,17 @@ import { describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
 import { number } from "./number.ts";
 
-describe('number', () => {
-  it('initializes to 0 without a default', async() => {
-    await run(function*() {
+describe("number", () => {
+  it("initializes to 0 without a default", async () => {
+    await run(function* () {
       const n = yield* number();
 
       expect(n.value).toBe(0);
     });
   });
 
-  it("increments the value", async() => {
-    await run(function*() {
+  it("increments the value", async () => {
+    await run(function* () {
       const n = yield* number(42);
       const subscription = yield* n;
 
@@ -22,9 +22,9 @@ describe('number', () => {
       expect((yield* subscription.next()).value).toBe(43);
     });
   });
-  
-  it("decrements the value", async() => {
-    await run(function*() {
+
+  it("decrements the value", async () => {
+    await run(function* () {
       const n = yield* number(42);
       const subscription = yield* n;
 
@@ -34,8 +34,8 @@ describe('number', () => {
     });
   });
 
-  it("sets the value", async() => {
-    await run(function*() {
+  it("sets the value", async () => {
+    await run(function* () {
       const n = yield* number(42);
       const subscription = yield* n;
 
@@ -43,5 +43,5 @@ describe('number', () => {
 
       expect((yield* subscription.next()).value).toBe(100);
     });
-  })
+  });
 });
